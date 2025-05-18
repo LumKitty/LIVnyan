@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.36105.23 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIV_VNyan", "LIV_VNyan.csproj", "{09F7466F-7007-49E6-BBE2-C81718554523}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VNyan_Liv", "VNyan_Liv\VNyan_Liv.csproj", "{055FEC7D-CAB6-42E1-8855-8B29E5AA7877}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Plugin|x64 = Plugin|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09F7466F-7007-49E6-BBE2-C81718554523}.Plugin|x64.ActiveCfg = Plugin|x64
+		{09F7466F-7007-49E6-BBE2-C81718554523}.Plugin|x64.Build.0 = Plugin|x64
+		{055FEC7D-CAB6-42E1-8855-8B29E5AA7877}.Plugin|x64.ActiveCfg = Release|Any CPU
+		{055FEC7D-CAB6-42E1-8855-8B29E5AA7877}.Plugin|x64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2B5586F2-0032-465C-AA27-A30922505C03}
+	EndGlobalSection
+EndGlobal
