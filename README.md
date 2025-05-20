@@ -16,8 +16,8 @@ Capture LIV Output
 Using the transform editor, crop right: 1920 top: 1080 from your LIV Output  
 Source clone LIV Output, crop left: 1920 bottom: 1080 put behind LIV Output. Name it Alpha Mask  
 Capture VNyan sprout as usual  
-Source clone LIV Output, crop right 1920 top: 1080. Blending mode: add. Name it Glow  
-Source clone LIV Output, crop right 1920 top: 1080. Filter: Advanced mask, use Source "Alpha Mask" and filter greyscale  
+Source clone LIV Output, crop right 1920 bottom: 1080. Blending mode: add. Name it Glow  
+Source clone LIV Output, crop right 1920 bottom: 1080. Filter: Advanced mask, use Source "Alpha Mask" and filter greyscale  
 
 ## Use in VNyan
 Clicking the plugin button toggle camera sync  
