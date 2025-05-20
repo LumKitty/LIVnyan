@@ -1,5 +1,7 @@
 ## LIV-VNyan camera sync plugin
 
+![ezgif-82a5aa22420e84](https://github.com/user-attachments/assets/dcdc99ee-3f80-4e9f-bb56-4fcd5e13ef3b)
+
 Alpha, at own risk, syncs your VNyan camera over to LIV mixed reality, allowing for VNyan to be your model renderer and have a fully featured model
 
 VNyan DLLs go in the VNyan\Items\Assemblies folder  
