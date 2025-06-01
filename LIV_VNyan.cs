@@ -34,6 +34,8 @@ public class VNyanCameraPluginSettings : IPluginSettings {
     public int LivUdpPort = 42069;
     public int VNyanUdpPort = 42070;
     public string VNyanAddress = "127.0.0.1";
+    public string LogFileName = "D:\\Dev\\Livcam.log";
+    public bool LogEnabled = false;
 }
 
 // The class must implement IPluginCameraBehaviour to be recognized by LIV as a plugin.
@@ -57,7 +59,7 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     // Author name.
     public string author => "LumKitty";
     // Plugin version.
-    public string version => "0.2";
+    public string version => "0.3";
     // Localy store the camera helper provided by LIV.
     PluginCameraHelper _helper;
 
@@ -67,16 +69,22 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     // OnActivate function is called when your camera behaviour was selected by the user.
     // The pluginCameraHelper is provided to you to help you with Player/Camera related operations.
 
-    public const string LogFileName = "D:\\Dev\\Livcam.log";
-
     private UDPSocket UDPServer;
+    private UDPSocket UDPClient;
 
     public void OnActivate(PluginCameraHelper helper) {
+        if (_settings.LogFileName != "") { 
+            File.WriteAllText(_settings.LogFileName, "");
+        }
+        Log("Lum's VNyan camera plugin version " + version + " starting");
         _helper = helper;
         Log("Creating UDP Server");
         UDPServer = new UDPSocket();
         UDPServer.Server("127.0.0.1", _settings.LivUdpPort);
-        File.WriteAllText(LogFileName, "Lum's VNyan camera plugin version " + version + " starting");
+        Log("Creating UDP Client");
+        UDPClient = new UDPSocket();
+        UDPClient.Client(_settings.VNyanAddress, _settings.VNyanUdpPort);
+        UDPClient.Send("UPD:3");
     }
 
     // OnSettingsDeserialized is called only when the user has changed camera profile or when the.
@@ -95,7 +103,9 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     // When you are reading other transform positions during OnUpdate it could be possible that the position comes from a previus frame
     // and has not been updated yet. If that is a concern, it is recommended to use OnLateUpdate instead.
     public void Log(string message) {
-        File.AppendAllText(LogFileName, message + "\r\n");
+        if (_settings.LogEnabled) {
+            File.AppendAllText(_settings.LogFileName, message + "\r\n");
+        }
     }
 
     //float _elaspedTime;
@@ -111,10 +121,12 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
             string LineInput = UDPServer.LastMessage;
 
             if (LineInput != null) {
-                Log("Received :" + LineInput);
+                Log("Received: " + LineInput);
                 if (LineInput.Length > 4) {
-                    switch (LineInput.Substring(0, 4)) {
-                        case "POS:":
+                    string command = LineInput.Substring(0,4);
+                    Log("Command: " + command);
+                    switch (command) {
+                        case "POS:": case "POV:":
                             float X;
                             float Y;
                             float Z;
@@ -137,6 +149,10 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
                             Log("TargetCamPos: " + TargetCameraPosition.ToString());
                             Log("TargetCamRot: " + TargetCameraRotation.ToString());
                             // _helper.UpdateCameraPose(TargetCameraPosition, TargetCameraRotation);
+                            if (command == "POV:") {
+                                float.TryParse(Values[6], out FOV);
+                                Log("Desired FOV: " + FOV);
+                            }
                             break;
                         case "FOV:":
                             float.TryParse(LineInput.Substring(4), out FOV);
@@ -164,8 +180,7 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     public void OnDeactivate() {
         // Saving settings here
         ApplySettings?.Invoke(this, EventArgs.Empty);
-        File.WriteAllText(LogFileName, "Lum's VNyan camera plugin version " + version + " closing");
-        
+        Log("Lum's VNyan camera plugin version " + version + " closing");
     }
 
     // OnDestroy is called when the users selects a camera behaviour which is not a plugin or when the application is about to close.
@@ -182,7 +197,7 @@ public class UDPSocket {
     private State state = new State();
     private EndPoint epFrom = new IPEndPoint(IPAddress.Any, 0);
     private AsyncCallback recv = null;
-    public string _LastMessage;
+    public string _LastMessage = "NUL";
     public string LastMessage {
         get {
             string temp = _LastMessage;
@@ -216,7 +231,6 @@ public class UDPSocket {
     }
 
     private void Receive() {
-        string result = "";
         _socket.BeginReceiveFrom(state.buffer, 0, bufSize, SocketFlags.None, ref epFrom, recv = (ar) => {
             State so = (State)ar.AsyncState;
             int bytes = _socket.EndReceiveFrom(ar, ref epFrom);
