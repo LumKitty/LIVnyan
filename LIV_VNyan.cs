@@ -31,7 +31,9 @@ using Signals.Examples;
 // Only public variables will be serialized.
 public class VNyanCameraPluginSettings : IPluginSettings {
     public bool FromVNyan = true;
-    public int UDPPort = 42069;
+    public int LivUdpPort = 42069;
+    public int VNyanUdpPort = 42070;
+    public string VNyanAddress = "127.0.0.1";
 }
 
 // The class must implement IPluginCameraBehaviour to be recognized by LIV as a plugin.
@@ -55,7 +57,7 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     // Author name.
     public string author => "LumKitty";
     // Plugin version.
-    public string version => "0.1";
+    public string version => "0.2";
     // Localy store the camera helper provided by LIV.
     PluginCameraHelper _helper;
 
@@ -73,7 +75,8 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
         _helper = helper;
         Log("Creating UDP Server");
         UDPServer = new UDPSocket();
-        UDPServer.Server("127.0.0.1", 42069);
+        UDPServer.Server("127.0.0.1", _settings.LivUdpPort);
+        File.WriteAllText(LogFileName, "Lum's VNyan camera plugin version " + version + " starting");
     }
 
     // OnSettingsDeserialized is called only when the user has changed camera profile or when the.
@@ -92,7 +95,7 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     // When you are reading other transform positions during OnUpdate it could be possible that the position comes from a previus frame
     // and has not been updated yet. If that is a concern, it is recommended to use OnLateUpdate instead.
     public void Log(string message) {
-        // File.AppendAllText(LogFileName, message + "\r\n");
+        File.AppendAllText(LogFileName, message + "\r\n");
     }
 
     //float _elaspedTime;
@@ -127,19 +130,22 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
                             float.TryParse(Values[3], out rX);
                             float.TryParse(Values[4], out rY);
                             float.TryParse(Values[5], out rZ);
-                            float.TryParse(Values[6], out FOV);
                             Log("Desired position: X:" + X + " Y:" + Y + " Z:" + X);
                             Log("Desired rotation: X:" + rX + " Y:" + rY + " Z:" + rZ);
-                            Log("Desired FOV: " + FOV);
                             TargetCameraPosition = new Vector3(X, Y, Z);
                             TargetCameraRotation = Quaternion.Euler(rX, rY, rZ);
                             Log("TargetCamPos: " + TargetCameraPosition.ToString());
                             Log("TargetCamRot: " + TargetCameraRotation.ToString());
-                            
+                            // _helper.UpdateCameraPose(TargetCameraPosition, TargetCameraRotation);
+                            break;
+                        case "FOV:":
+                            float.TryParse(LineInput.Substring(4), out FOV);
+                            Log("Desired FOV: " + FOV);
+                            // _helper.UpdateFov(FOV);
                             break;
                     }
                 }
-            } 
+            }
             _helper.UpdateCameraPose(TargetCameraPosition, TargetCameraRotation);
             _helper.UpdateFov(FOV);
         } catch (Exception ex) {
@@ -158,6 +164,8 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     public void OnDeactivate() {
         // Saving settings here
         ApplySettings?.Invoke(this, EventArgs.Empty);
+        File.WriteAllText(LogFileName, "Lum's VNyan camera plugin version " + version + " closing");
+        
     }
 
     // OnDestroy is called when the users selects a camera behaviour which is not a plugin or when the application is about to close.
