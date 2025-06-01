@@ -1,1 +1,0 @@
-WinMove 32,0,3840,2160,"ahk_exe capture.exe"
