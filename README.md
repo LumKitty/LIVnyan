@@ -18,10 +18,10 @@ Alpha, at own risk, syncs your VNyan camera over to LIV mixed reality, allowing 
 * Install plugins [Source Clone](https://obsproject.com/forum/resources/source-clone.1632/) and [Advanced Mask](https://obsproject.com/forum/resources/advanced-masks.1856/)  
 * Capture LIV Output using Game Capture, name it "LIV Quadrants"  
 * Using the transform editor on "LIV Quadrants", crop right: 1920 top: 1080 from your LIV Output. Do not use filters for this!  
-* Source clone "LIV Quadrants", crop left: 1920 bottom: 1080 put behind LIV Output. Name it "LIV Alpha Mask"  
+* Source clone "LIV Quadrants", Add a crop filter, crop left: 1920 bottom: 1080 put behind LIV Output. Name it "LIV Alpha Mask". Do not use a transform for this!  
 * Capture VNyan Spout2 output in the usual way  
-* Source clone "LIV Quadrants" again, crop right 1920 bottom: 1080. Blending mode: add. Name it "LIV Glow"  
-* Source clone "LIV Quadrants" again, crop right 1920 bottom: 1080. Name it "LIV Front Layer"
+* Source clone "LIV Quadrants" again, Add a crop filter, crop right 1920 bottom: 1080. Blending mode: add. Name it "LIV Glow"  
+* Source clone "LIV Quadrants" again, Add a crop filter, crop right 1920 bottom: 1080. Name it "LIV Front Layer"
 * Add a filter to "LIV Front Layer": Advanced mask, use Source "LIV Alpha Mask" and filter type "greyscale"  
 
 The end result should look something like this:  
