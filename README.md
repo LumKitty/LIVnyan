@@ -4,6 +4,9 @@
 
 Alpha, at own risk, syncs your VNyan camera over to LIV mixed reality, allowing for VNyan to be your model renderer and have a fully featured model
 
+## Overview
+It is important to understand how this plugin works. Normally LIV will split the VR scene into effectively three image layers, background, glow and foreground. It will then build up a composite image: Background, VRM avatar, glow layer and foreground. This setup works by replacing the VRM avatar layer with a capture from VNyan and manually doing the compositing of the layers in OBS, instead of letting LIV do it. In order to make VNyan fit correctly there are a pair of plugins, one for VNyan that sends its camera position, over to the LIV plugin which sets the camera plugin to match VNyan.
+
 ## Installation  
 * VNyan DLLs go in the VNyan\Items\Assemblies folder  
 * LIV DLL goes in C:\Users\<you>\Documents\LIV\Plugins\CameraBehaviours  
