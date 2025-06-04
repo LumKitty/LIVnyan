@@ -23,9 +23,11 @@ It is important to understand how this plugin works. Normally LIV will split the
 * Using the transform editor on "LIV Quadrants", crop right: 1920 top: 1080 from your LIV Output. Do not use filters for this!  
 * Source clone "LIV Quadrants", Add a crop filter, crop left: 1920 bottom: 1080 put behind LIV Output. Name it "LIV Alpha Mask". Do not use a transform for this!  
 * Capture VNyan Spout2 output in the usual way  
-* Source clone "LIV Quadrants" again, Add a crop filter, crop right 1920 bottom: 1080. Blending mode: add. Name it "LIV Glow"  
+* Source clone "LIV Quadrants" again, Add a crop filter, crop right 1920 bottom: 1080. Name it "LIV Glow". Right click it -> Blending Mode -> Add  
 * Source clone "LIV Quadrants" again, Add a crop filter, crop right 1920 bottom: 1080. Name it "LIV Front Layer"
-* Add a filter to "LIV Front Layer": Advanced mask, use Source "LIV Alpha Mask" and filter type "greyscale"  
+* Add a filter to "LIV Front Layer": Advanced mask, use Source "LIV Alpha Mask" and filter type "greyscale"
+  ![image](https://github.com/user-attachments/assets/d530679a-1a00-4619-bfac-eb09ddfb9e44)
+
 
 The end result should look something like this:  
 ![image](https://github.com/user-attachments/assets/112250d1-3203-4a98-a06d-a98a56ece377)
