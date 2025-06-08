@@ -9,66 +9,62 @@ using System.Collections.Generic;
 using System.Runtime;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Runtime.InteropServices;
+using System.IO.MemoryMappedFiles;
+using static UnityEngine.Experimental.Rendering.RayTracingAccelerationStructure;
 
 namespace VNyan_Liv {
     public class VNyan_Liv : MonoBehaviour, IVNyanPluginManifest, IButtonClickedHandler, ITriggerHandler {
         public string PluginName { get; } = "VNyan_Liv";
-        public string Version { get; } = "v0.3";
+        public string Version { get; } = "v0.4";
         public string Title { get; } = "VNyan to LIV camera sync";
         public string Author { get; } = "LumKitty";
         public string Website { get; } = "https://lum.uk/";
 
-        public class State {
-            public byte[] buffer = new byte[bufSize];
-        }
-
-        private const string DecFormat = "0.0000000000000";
         private const string SettingsFileName = "LIVnyan.cfg";
-        private string LIVAddress;
-        private int LIVPort;
-        private int VNyanPort;
-        private static Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        private const int bufSize = 8 * 1024;
-        private static State state = new State();
-        private static EndPoint epFrom = new IPEndPoint(IPAddress.Any, 0);
-        // private static AsyncCallback recv = null;
+
+        private static float[] CamData = new float[9];
+        private static Mutex mutex;
+        private static MemoryMappedFile mmf;
+        private static MemoryMappedViewAccessor mmfAccess;
+        private const int MMFSize = sizeof(float) * 9;
+
         private static bool Enabled = false;
-        private static Vector3 OldCameraPos;
-        private static Quaternion OldCameraRot;
-        private static float OldCameraFOV;
-        private static UDPSocket UDPServer;
         private static bool LogEnabled;
 
         void ErrorHandler(Exception e) {
-            VNyanInterface.VNyanInterface.VNyanParameter.setVNyanParameterString("_lum_ext_err", e.ToString());
-            Log("DBG:" + e.ToString());
+            VNyanInterface.VNyanInterface.VNyanParameter.setVNyanParameterString("_lum_liv_err", e.ToString());
+            Log("LIVNyan ERR:" + e.ToString());
         }
 
         public void Log(string message) {
             if (LogEnabled) {
-                UnityEngine.Debug.Log(message);
+                //System.IO.File.AppendAllText("D:\\Dev\\VNyan-liv.log", message+"\n");
+                UnityEngine.Debug.Log("LIVnyan|" + message);
             }
-        }
-        
-        public void Send(string text) {
-            byte[] data = Encoding.ASCII.GetBytes(text);
-            _socket.BeginSend(data, 0, data.Length, SocketFlags.None, (ar) => {
-                State so = (State)ar.AsyncState;
-                int bytes = _socket.EndSend(ar);
-                // Console.WriteLine("SEND: {0}, {1}", bytes, text);
-            }, state);
         }
 
         public void InitializePlugin() {
             try {
                 VNyanInterface.VNyanInterface.VNyanTrigger.registerTriggerListener(this);
                 VNyanInterface.VNyanInterface.VNyanUI.registerPluginButton("LumKitty's LIV Camera sync", this);
-                LoadPluginSettings();
+                //LoadPluginSettings();
+                LogEnabled = true;
+                System.IO.File.WriteAllText("D:\\Dev\\VNyan-liv.log", "");
                 Log("Lum's VNyan-LIV plugin version " + Version + " started");
-                _socket.Connect(IPAddress.Parse(LIVAddress), LIVPort);
-                UDPServer = new UDPSocket();
-                UDPServer.Server("127.0.0.1", VNyanPort);
-                //Receive();
+                Log("Float size: " + sizeof(float).ToString() + " bytes");
+                Log("Bool size: " + sizeof(bool).ToString() + " bytes");
+                Log("meow");
+                bool MutexCreated;
+                Log("Creating file");
+                mmf = MemoryMappedFile.CreateOrOpen("uk.lum.livnyan.cameradata3", MMFSize);
+                Log("Creating mutex");
+                Mutex mutex = new Mutex(true, "uk.lum.livnyan.cameradata.mutex", out MutexCreated);
+                Log("Getting mutex");
+                // mutex.WaitOne();
+                Log("Creating accessor");
+                mmfAccess = mmf.CreateViewAccessor(0, MMFSize);
+
             } catch (Exception e) {
                 ErrorHandler(e);
             }
@@ -80,24 +76,12 @@ namespace VNyan_Liv {
             bool SettingMissing = false;
             if (settings != null) {
                 // Read string value
-                string temp_LIVAddress;
-                string temp_LIVPort;
-                string temp_VNyanPort;
                 string temp_LogEnabled;
 
-                settings.TryGetValue("LIVAddress", out temp_LIVAddress);
-                settings.TryGetValue("LIVPort", out temp_LIVPort);
-                settings.TryGetValue("VNyanPort", out temp_VNyanPort);
                 settings.TryGetValue("LogEnabled", out temp_LogEnabled);
-                if (temp_LIVAddress != null) { LIVAddress = temp_LIVAddress; } else { LIVAddress = "127.0.0.1"; SettingMissing = true; }
-                if (temp_LIVPort != null) { LIVPort = int.Parse(temp_LIVPort); } else { LIVPort = 42069; SettingMissing = true; }
-                if (temp_VNyanPort != null) { VNyanPort = int.Parse(temp_VNyanPort); } else { VNyanPort = 42070; SettingMissing = true; }
                 if (temp_LogEnabled != null) { LogEnabled = bool.Parse(temp_LogEnabled); } else { LogEnabled = false; SettingMissing = true; }
             } else {
                 Log("No settings file detected, using defaults");
-                LIVAddress = "127.0.0.1";
-                LIVPort = 42069;
-                VNyanPort = 42070;
                 LogEnabled = false;
                 SettingMissing = true;
             }
@@ -109,58 +93,37 @@ namespace VNyan_Liv {
 
         private void SavePluginSettings() {
             Dictionary<string, string> settings = new Dictionary<string, string>();
-            settings["LIVAddress"] = LIVAddress;
-            settings["LIVPort"] = LIVPort.ToString();
-            settings["VNyanPort"] = VNyanPort.ToString();
             settings["LogEnabled"] = LogEnabled.ToString();
 
             VNyanInterface.VNyanInterface.VNyanSettings.saveSettings(SettingsFileName, settings);
         }
 
-
-        private void UpdateCameraPos(Camera camera, bool UpdateFOV = false) {
-            float pX = camera.transform.position.x;
-            float pY = camera.transform.position.y;
-            float pZ = camera.transform.position.z;
-            float rX = camera.transform.rotation.eulerAngles.x;
-            float rY = camera.transform.rotation.eulerAngles.y;
-            float rZ = camera.transform.rotation.eulerAngles.z;
-            string message = pX.ToString(DecFormat) + "," + pY.ToString(DecFormat) + "," + pZ.ToString(DecFormat) + ","
-                           + rX.ToString(DecFormat) + "," + rY.ToString(DecFormat) + "," + rZ.ToString(DecFormat);
-            if (UpdateFOV) {
-                float FOV = camera.fieldOfView;
-                message = "POV:"+message+","+ FOV.ToString(DecFormat);
-            } else {
-                message = "POS:" + message;
-            }
-            Log(message);
-            Send(message);
-            OldCameraPos = camera.transform.position;
-            OldCameraRot = camera.transform.rotation;
-        }
-        private void UpdateCameraFOV(Camera camera) {
-            float FOV = camera.fieldOfView;
-            string message = "FOV:" + FOV.ToString(DecFormat);
-            Log(message);
-            Send(message);
-            OldCameraFOV = FOV;
-        }
-        private void SetCam() {
-            var camera = Camera.main;
-            if ((camera.transform.position != OldCameraPos) || (camera.transform.rotation != OldCameraRot)) {
-                UpdateCameraPos(camera);
-            }
-            if (camera.fieldOfView != OldCameraFOV) {
-                UpdateCameraFOV(camera);
+        unsafe private void SetCam() {
+            try { 
+                if (Enabled) {
+                    var camera = Camera.main;
+                    mmfAccess.Write(                0, camera.transform.position.x);
+                    mmfAccess.Write(sizeof(float) * 1, camera.transform.position.y);
+                    mmfAccess.Write(sizeof(float) * 2, camera.transform.position.z);
+                    mmfAccess.Write(sizeof(float) * 3, camera.transform.rotation.w);
+                    mmfAccess.Write(sizeof(float) * 4, camera.transform.rotation.x);
+                    mmfAccess.Write(sizeof(float) * 5, camera.transform.rotation.y);
+                    mmfAccess.Write(sizeof(float) * 6, camera.transform.rotation.z);
+                    mmfAccess.Write(sizeof(float) * 7, camera.fieldOfView);
+                    if (Enabled) {
+                        mmfAccess.Write(sizeof(float) * 8, 1);
+                    } else {
+                        mmfAccess.Write(sizeof(float) * 8, 0);
+                    }
+                }
+            } catch (Exception e) {
+                ErrorHandler(e);
             }
         }
 
         public void pluginButtonClicked() {
             Enabled = !Enabled;
-            if (Enabled) {
-                var camera = Camera.main;
-                UpdateCameraPos(camera, true);
-            }
+            Log("Enabled :" + Enabled.ToString());
         }
 
         public void triggerCalled(string name, int int1, int int2, int int3, string text1, string text2, string text3) {
@@ -192,56 +155,6 @@ namespace VNyan_Liv {
         }
         public void Update() {
             if (Enabled) { SetCam(); }
-            string LineInput = UDPServer.LastMessage;
-
-            if (LineInput != null) {
-                Log("Received: " + LineInput);
-                if (LineInput.Length > 4) {
-                    switch (LineInput.Substring(0, 4)) {
-                        case "UPD:":
-                            var camera = Camera.main;
-                            UpdateCameraPos(camera, true);
-                            
-                            break;
-                    }
-                }
-            }
         }
     }
-    public class UDPSocket {
-        private Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        private const int bufSize = 8 * 1024;
-        private State state = new State();
-        private EndPoint epFrom = new IPEndPoint(IPAddress.Any, 0);
-        private AsyncCallback recv = null;
-        public string _LastMessage;
-        public string LastMessage {
-            get {
-                string temp = _LastMessage;
-                _LastMessage = null;
-                return temp;
-            }
-        }
-
-        public class State {
-            public byte[] buffer = new byte[bufSize];
-        }
-
-        public void Server(string address, int port) {
-            _socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.ReuseAddress, true);
-            _socket.Bind(new IPEndPoint(IPAddress.Parse(address), port));
-            Receive();
-        }
-
-        private void Receive() {
-            _socket.BeginReceiveFrom(state.buffer, 0, bufSize, SocketFlags.None, ref epFrom, recv = (ar) => {
-                State so = (State)ar.AsyncState;
-                int bytes = _socket.EndReceiveFrom(ar, ref epFrom);
-                _socket.BeginReceiveFrom(so.buffer, 0, bufSize, SocketFlags.None, ref epFrom, recv, so);
-                //VNyanCameraPlugin.Log("RECV: " +epFrom.ToString() + " " + bytes.ToString() + " " + Encoding.ASCII.GetString(so.buffer, 0, bytes));
-                _LastMessage = Encoding.ASCII.GetString(so.buffer, 0, bytes);
-            }, state);
-        }
-    }
-
 }

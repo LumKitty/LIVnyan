@@ -26,42 +26,32 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 using Signals.Examples;
+using System.Runtime.InteropServices;
+using System.IO.MemoryMappedFiles;
+using System.Threading;
 
 // User defined settings which will be serialized and deserialized with Newtonsoft Json.Net.
 // Only public variables will be serialized.
 public class VNyanCameraPluginSettings : IPluginSettings {
     public bool FromVNyan = true;
-    public int LivUdpPort = 42069;
-    public int VNyanUdpPort = 42070;
-    public string VNyanAddress = "127.0.0.1";
     public string LogFileName = "D:\\Dev\\Livcam.log";
-    public bool LogEnabled = false;
+    public bool LogEnabled = true;
 }
 
 // The class must implement IPluginCameraBehaviour to be recognized by LIV as a plugin.
 public class VNyanCameraPlugin : IPluginCameraBehaviour {
-
-    // Store your settings localy so you can access them.
     VNyanCameraPluginSettings _settings = new VNyanCameraPluginSettings();
 
-    // Provide your own settings to store user defined settings .   
     public IPluginSettings settings => _settings;
-
-    // Invoke ApplySettings event when you need to save your settings.
-    // Do not invoke event every frame if possible.
     public event EventHandler ApplySettings;
-
-    // ID is used for the camera behaviour identification when the behaviour is selected by the user.
-    // It has to be unique so there are no plugin collisions.
     public string ID => "VNyanCameraPlugin";
-    // Readable plugin name "Keep it short".
     public string name => "VNyan Camera";
-    // Author name.
     public string author => "LumKitty";
-    // Plugin version.
-    public string version => "0.3";
-    // Localy store the camera helper provided by LIV.
+    public string version => "0.4";
     PluginCameraHelper _helper;
+    string LogFileName;
+    bool LogEnabled = true;
+    
 
     // Constructor is called when plugin loads
     public VNyanCameraPlugin() { }
@@ -69,23 +59,8 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     // OnActivate function is called when your camera behaviour was selected by the user.
     // The pluginCameraHelper is provided to you to help you with Player/Camera related operations.
 
-    private UDPSocket UDPServer;
-    private UDPSocket UDPClient;
-
-    public void OnActivate(PluginCameraHelper helper) {
-        if (_settings.LogFileName != "") { 
-            File.WriteAllText(_settings.LogFileName, "");
-        }
-        Log("Lum's VNyan camera plugin version " + version + " starting");
-        _helper = helper;
-        Log("Creating UDP Server");
-        UDPServer = new UDPSocket();
-        UDPServer.Server("127.0.0.1", _settings.LivUdpPort);
-        Log("Creating UDP Client");
-        UDPClient = new UDPSocket();
-        UDPClient.Client(_settings.VNyanAddress, _settings.VNyanUdpPort);
-        UDPClient.Send("UPD:3");
-    }
+    //private UDPSocket UDPServer;
+    //private UDPSocket UDPClient;
 
     // OnSettingsDeserialized is called only when the user has changed camera profile or when the.
     // last camera profile has been loaded. This overwrites your settings with last data if they exist.
@@ -103,70 +78,63 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     // When you are reading other transform positions during OnUpdate it could be possible that the position comes from a previus frame
     // and has not been updated yet. If that is a concern, it is recommended to use OnLateUpdate instead.
     public void Log(string message) {
-        if (_settings.LogEnabled) {
-            File.AppendAllText(_settings.LogFileName, message + "\r\n");
+        if (LogEnabled) {
+            File.AppendAllText(LogFileName, message + "\r\n");
         }
     }
 
     //float _elaspedTime;
-    Vector3 TargetCameraPosition = new Vector3((float)-0.8, (float)1.1,(float)1.6);
-    Quaternion TargetCameraRotation = new Quaternion((float)0.0, (float)1.0, (float)0.0, (float)0.2);
-    float FOV=35;
+    private static Mutex mutex;
+    private static MemoryMappedFile mmf;
+    private static MemoryMappedViewAccessor mmfAccess;
+    const int MMFSize = (sizeof(float) * 9);
+    private float[] CamData = new float[9];
+    private Vector3 CamPos;
+    private Quaternion CamRot;
+    private float CamFOV;
 
     [Obsolete]
-    public void OnUpdate() {
-
+    public void OnActivate(PluginCameraHelper helper) {
         try {
-
-            string LineInput = UDPServer.LastMessage;
-
-            if (LineInput != null) {
-                Log("Received: " + LineInput);
-                if (LineInput.Length > 4) {
-                    string command = LineInput.Substring(0,4);
-                    Log("Command: " + command);
-                    switch (command) {
-                        case "POS:": case "POV:":
-                            float X;
-                            float Y;
-                            float Z;
-                            float rX;
-                            float rY;
-                            float rZ;
-                            Log("Position change requested");
-                            string Positions = LineInput.Substring(4);
-                            string[] Values = Positions.Split(',');
-                            float.TryParse(Values[0], out X);
-                            float.TryParse(Values[1], out Y);
-                            float.TryParse(Values[2], out Z);
-                            float.TryParse(Values[3], out rX);
-                            float.TryParse(Values[4], out rY);
-                            float.TryParse(Values[5], out rZ);
-                            Log("Desired position: X:" + X + " Y:" + Y + " Z:" + X);
-                            Log("Desired rotation: X:" + rX + " Y:" + rY + " Z:" + rZ);
-                            TargetCameraPosition = new Vector3(X, Y, Z);
-                            TargetCameraRotation = Quaternion.Euler(rX, rY, rZ);
-                            Log("TargetCamPos: " + TargetCameraPosition.ToString());
-                            Log("TargetCamRot: " + TargetCameraRotation.ToString());
-                            // _helper.UpdateCameraPose(TargetCameraPosition, TargetCameraRotation);
-                            if (command == "POV:") {
-                                float.TryParse(Values[6], out FOV);
-                                Log("Desired FOV: " + FOV);
-                            }
-                            break;
-                        case "FOV:":
-                            float.TryParse(LineInput.Substring(4), out FOV);
-                            Log("Desired FOV: " + FOV);
-                            // _helper.UpdateFov(FOV);
-                            break;
-                    }
-                }
-            }
-            _helper.UpdateCameraPose(TargetCameraPosition, TargetCameraRotation);
-            _helper.UpdateFov(FOV);
+            string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string settingLoc = Path.Combine(docPath, @"LIV\Plugins\CameraBehaviours\");
+            LogFileName = settingLoc + "LIVNyan.log";
+            //if (_settings.LogFileName != "") {
+            File.WriteAllText(LogFileName, "");
+            //}
+            Log("Lum's VNyan camera plugin version " + version + " starting");
+            Log("Float size: " + sizeof(float).ToString() + " bytes");
+            Log("Bool size: " + sizeof(bool).ToString() + " bytes");
+            _helper = helper;
+            bool MutexCreated;
+            Log("Creating file");
+            mmf = MemoryMappedFile.CreateOrOpen("uk.lum.livnyan.cameradata3", MMFSize);
+            Log("Creating mutex");
+            mutex = new Mutex(true, "uk.lum.livnyan.cameradata.mutex", out MutexCreated);
+            Log("Getting mutex");
+            mutex.WaitOne();
+            Log("Creating accessor");
+            mmfAccess = mmf.CreateViewAccessor(0, MMFSize, MemoryMappedFileAccess.Read);
         } catch (Exception ex) {
             Log(ex.ToString());
-            throw;
+        }
+    }
+    public void OnUpdate() {
+        try {
+            mmfAccess.ReadArray<float>(0, CamData, 0, 9);
+            CamPos.x = CamData[0];
+            CamPos.y = CamData[1];
+            CamPos.z = CamData[2];
+            CamRot.w = CamData[3];
+            CamRot.x = CamData[4];
+            CamRot.y = CamData[5];
+            CamRot.z = CamData[6];
+            CamFOV   = CamData[7];
+            //Log("Read POS: " + CamPos.ToString() + ", ROT: " + CamRot.ToString() + " FOV: " + CamFOV.ToString());
+            _helper.UpdateCameraPose(CamPos, CamRot);
+            _helper.UpdateFov(CamFOV);
+        } catch (Exception ex) {
+            Log(ex.ToString());
         }
     }
 
@@ -181,62 +149,15 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
         // Saving settings here
         ApplySettings?.Invoke(this, EventArgs.Empty);
         Log("Lum's VNyan camera plugin version " + version + " closing");
+        mmfAccess.Dispose();
+        mutex.Close();
+        mutex.Dispose();
+        mmf.Dispose();
     }
 
     // OnDestroy is called when the users selects a camera behaviour which is not a plugin or when the application is about to close.
     // This is the last chance to clean after your self.
     public void OnDestroy() {
 
-    }
-}
-
-
-public class UDPSocket {
-    private Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-    private const int bufSize = 8 * 1024;
-    private State state = new State();
-    private EndPoint epFrom = new IPEndPoint(IPAddress.Any, 0);
-    private AsyncCallback recv = null;
-    public string _LastMessage = "NUL";
-    public string LastMessage {
-        get {
-            string temp = _LastMessage;
-            _LastMessage = null;
-            return temp;
-        }
-    }
-
-    public class State {
-        public byte[] buffer = new byte[bufSize];
-    }
-
-    public void Server(string address, int port) {
-        _socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.ReuseAddress, true);
-        _socket.Bind(new IPEndPoint(IPAddress.Parse(address), port));
-        Receive();
-    }
-
-    public void Client(string address, int port) {
-        _socket.Connect(IPAddress.Parse(address), port);
-        Receive();
-    }
-
-    public void Send(string text) {
-        byte[] data = Encoding.ASCII.GetBytes(text);
-        _socket.BeginSend(data, 0, data.Length, SocketFlags.None, (ar) => {
-            State so = (State)ar.AsyncState;
-            int bytes = _socket.EndSend(ar);
-            Console.WriteLine("SEND: {0}, {1}", bytes, text);
-        }, state);
-    }
-
-    private void Receive() {
-        _socket.BeginReceiveFrom(state.buffer, 0, bufSize, SocketFlags.None, ref epFrom, recv = (ar) => {
-            State so = (State)ar.AsyncState;
-            int bytes = _socket.EndReceiveFrom(ar, ref epFrom);
-            _socket.BeginReceiveFrom(so.buffer, 0, bufSize, SocketFlags.None, ref epFrom, recv, so);
-            //VNyanCameraPlugin.Log("RECV: " +epFrom.ToString() + " " + bytes.ToString() + " " + Encoding.ASCII.GetString(so.buffer, 0, bytes));
-            _LastMessage = Encoding.ASCII.GetString(so.buffer, 0, bytes);
-        }, state);
     }
 }
