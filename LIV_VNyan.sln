@@ -1,11 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.36105.23 d17.13
+VisualStudioVersion = 17.13.36105.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIV_VNyan", "LIV_VNyan.csproj", "{09F7466F-7007-49E6-BBE2-C81718554523}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LIV_VNyan", "LIV_VNyan\LIV_VNyan.csproj", "{09F7466F-7007-49E6-BBE2-C81718554523}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VNyan_Liv", "VNyan_Liv\VNyan_Liv.csproj", "{055FEC7D-CAB6-42E1-8855-8B29E5AA7877}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		Shared\SharedAssemblyInfo.cs = Shared\SharedAssemblyInfo.cs
+		Shared\SharedValues.cs = Shared\SharedValues.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,8 +21,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{09F7466F-7007-49E6-BBE2-C81718554523}.Plugin|x64.ActiveCfg = Plugin|x64
 		{09F7466F-7007-49E6-BBE2-C81718554523}.Plugin|x64.Build.0 = Plugin|x64
-		{055FEC7D-CAB6-42E1-8855-8B29E5AA7877}.Plugin|x64.ActiveCfg = Release|Any CPU
-		{055FEC7D-CAB6-42E1-8855-8B29E5AA7877}.Plugin|x64.Build.0 = Release|Any CPU
+		{055FEC7D-CAB6-42E1-8855-8B29E5AA7877}.Plugin|x64.ActiveCfg = Plugin|x64
+		{055FEC7D-CAB6-42E1-8855-8B29E5AA7877}.Plugin|x64.Build.0 = Plugin|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -28,6 +28,9 @@ It is important to understand how this plugin works. Normally LIV will split the
 * Add a filter to "LIV Front Layer": Advanced mask, use Source "LIV Alpha Mask" and filter type "greyscale"
   ![image](https://github.com/user-attachments/assets/d530679a-1a00-4619-bfac-eb09ddfb9e44)
 
+## Lighting
+Use [Sjatar's Stylistic Screen Light plugin](https://github.com/Sjatar/StylisticScreenLight)  
+Add a "Sprout Sender" filter to "LIV Front Layer" after crop/pad but before Advanced Mask. Name the source "screen"
 
 The end result should look something like this:  
 ![image](https://github.com/user-attachments/assets/112250d1-3203-4a98-a06d-a98a56ece377)
@@ -35,9 +38,16 @@ The end result should look something like this:
 ## Use in VNyan
 Clicking the plugin button toggles camera sync  
 ### Triggers:  
-```_lum_liv_setcam``` - one off sync  
 ```_lum_liv_enable``` - enable camera sync  
 ```_lum_liv_disable``` - disable camera sync  
+
+## Configuration
+Settings are stored in LIVnyan.cfg inside your VNyan profile directory (default %APPDATA%\..\LocalLow\Suvidriel\VNyan)
+```ActiveOnStart``` - Camera sync will start as soon as VNyan loads
+```LogEnabled``` - The VNyan plugin will log to player.log in the main VNyan profile directory. The LIV plugin will log to
+%USERPROFILE%\Documents\LIV\Plugins\CameraBehaviours\LIVnyan.log
+```LogSpam``` - Both plugins will log sent/recieved camera position, rotation & FOV, plus settings info every single frame. 
+These logs will get very big very quickly. Only enable this for troubleshooting!
 
 ## Troubleshooting
 ### Feet or bottom of screen getting clipped  

@@ -1,9 +1,11 @@
 ﻿using Microsoft.Win32.SafeHandles;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -16,11 +18,11 @@ using static UnityEngine.Experimental.Rendering.RayTracingAccelerationStructure;
 
 namespace VNyan_Liv {
     public class VNyan_Liv : MonoBehaviour, IVNyanPluginManifest, IButtonClickedHandler, ITriggerHandler {
-        public string PluginName { get; } = "VNyan_Liv";
-        public string Version { get; } = "v0.5";
+        public string PluginName { get; } = SharedValues.PluginName;
+        public string Version { get; } = SharedValues.Version;
         public string Title { get; } = "VNyan to LIV camera sync";
-        public string Author { get; } = "LumKitty";
-        public string Website { get; } = "https://lum.uk/";
+        public string Author { get; } = SharedValues.Author;
+        public string Website { get; } = SharedValues.Website;
 
         private const string SettingsFileName = "LIVnyan.cfg";
 
@@ -49,13 +51,20 @@ namespace VNyan_Liv {
         public void InitializePlugin() {
             try {
                 Log("Lum's VNyan-LIV plugin version " + Version + " started");
+                Log("Spawning gameobject");
+                using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(this.GetType(), "VNyan-Liv.vnobj")) {
+                    byte[] bundleData = new byte[stream.Length];
+                    stream.Read(bundleData, 0, bundleData.Length);
+                    AssetBundle bundle = AssetBundle.LoadFromMemory(bundleData);
+                    GameObject.Instantiate(bundle.LoadAsset<GameObject>(bundle.GetAllAssetNames()[0]));
+                }
                 VNyanInterface.VNyanInterface.VNyanTrigger.registerTriggerListener(this);
                 VNyanInterface.VNyanInterface.VNyanUI.registerPluginButton("LumKitty's LIV Camera sync", this);
                 Log("Float size: " + sizeof(float).ToString() + " bytes");
                 Log("Bool size: " + sizeof(bool).ToString() + " bytes");
                 Log("Creating file");
 
-                mmf = MemoryMappedFile.CreateOrOpen("uk.lum.livnyan.cameradata." + Version, MMFSize);
+                mmf = MemoryMappedFile.CreateOrOpen(SharedValues.MMFname, SharedValues.MMFSize);
 
                 Log("Creating accessor");
                 mmfAccess = mmf.CreateViewAccessor(0, MMFSize);
@@ -182,7 +191,6 @@ namespace VNyan_Liv {
         public void Update() {
             try {
                 SetCam();
-                //if ((VNyanSettings & 1) == 1) { SetCam(); }
             } catch (Exception e) {
                 ErrorHandler(e);
             }

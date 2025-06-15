@@ -33,9 +33,6 @@ using System.Threading;
 // User defined settings which will be serialized and deserialized with Newtonsoft Json.Net.
 // Only public variables will be serialized.
 public class VNyanCameraPluginSettings : IPluginSettings {
-    public bool FromVNyan = true;
-    public string LogFileName = "D:\\Dev\\Livcam.log";
-    public bool LogEnabled = true;
 }
 
 // The class must implement IPluginCameraBehaviour to be recognized by LIV as a plugin.
@@ -45,9 +42,9 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     public IPluginSettings settings => _settings;
     public event EventHandler ApplySettings;
     public string ID => "VNyanCameraPlugin";
-    public string name => "VNyan Camera";
-    public string author => "LumKitty";
-    public string version => "v0.5";
+    public string name => SharedValues.PluginName;
+    public string author => SharedValues.Author;
+    public string version => SharedValues.Version;
     PluginCameraHelper _helper;
     string LogFileName;
     bool LogEnabled = true;
@@ -87,7 +84,7 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     private static Mutex mutex;
     private static MemoryMappedFile mmf;
     private static MemoryMappedViewAccessor mmfAccess;
-    const int MMFSize = (sizeof(float) * 9);
+    
     private float[] CamData = new float[9];
     private Vector3 CamPos;
     private Quaternion CamRot;
@@ -109,13 +106,13 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
             _helper = helper;
             //bool MutexCreated;
             Log("Creating file");
-            mmf = MemoryMappedFile.CreateOrOpen("uk.lum.livnyan.cameradata."+version, MMFSize);
+            mmf = MemoryMappedFile.CreateOrOpen(SharedValues.MMFname, SharedValues.MMFSize);
             //Log("Creating mutex");
             //mutex = new Mutex(true, "uk.lum.livnyan.cameradata.mutex", out MutexCreated);
             //Log("Getting mutex");
             //mutex.WaitOne();
             Log("Creating accessor");
-            mmfAccess = mmf.CreateViewAccessor(0, MMFSize, MemoryMappedFileAccess.Read);
+            mmfAccess = mmf.CreateViewAccessor(0, SharedValues.MMFSize, MemoryMappedFileAccess.Read);
         } catch (Exception ex) {
             Log(ex.ToString());
         }
