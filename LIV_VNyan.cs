@@ -47,7 +47,7 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     public string ID => "VNyanCameraPlugin";
     public string name => "VNyan Camera";
     public string author => "LumKitty";
-    public string version => "0.4";
+    public string version => "v0.5";
     PluginCameraHelper _helper;
     string LogFileName;
     bool LogEnabled = true;
@@ -78,7 +78,7 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     // When you are reading other transform positions during OnUpdate it could be possible that the position comes from a previus frame
     // and has not been updated yet. If that is a concern, it is recommended to use OnLateUpdate instead.
     public void Log(string message) {
-        if (LogEnabled) {
+        if ((VNyanSettings & 2) == 2) {
             File.AppendAllText(LogFileName, message + "\r\n");
         }
     }
@@ -92,6 +92,7 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     private Vector3 CamPos;
     private Quaternion CamRot;
     private float CamFOV;
+    private int VNyanSettings=2;
 
     [Obsolete]
     public void OnActivate(PluginCameraHelper helper) {
@@ -106,13 +107,13 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
             Log("Float size: " + sizeof(float).ToString() + " bytes");
             Log("Bool size: " + sizeof(bool).ToString() + " bytes");
             _helper = helper;
-            bool MutexCreated;
+            //bool MutexCreated;
             Log("Creating file");
-            mmf = MemoryMappedFile.CreateOrOpen("uk.lum.livnyan.cameradata3", MMFSize);
-            Log("Creating mutex");
-            mutex = new Mutex(true, "uk.lum.livnyan.cameradata.mutex", out MutexCreated);
-            Log("Getting mutex");
-            mutex.WaitOne();
+            mmf = MemoryMappedFile.CreateOrOpen("uk.lum.livnyan.cameradata."+version, MMFSize);
+            //Log("Creating mutex");
+            //mutex = new Mutex(true, "uk.lum.livnyan.cameradata.mutex", out MutexCreated);
+            //Log("Getting mutex");
+            //mutex.WaitOne();
             Log("Creating accessor");
             mmfAccess = mmf.CreateViewAccessor(0, MMFSize, MemoryMappedFileAccess.Read);
         } catch (Exception ex) {
@@ -121,18 +122,24 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     }
     public void OnUpdate() {
         try {
-            mmfAccess.ReadArray<float>(0, CamData, 0, 9);
-            CamPos.x = CamData[0];
-            CamPos.y = CamData[1];
-            CamPos.z = CamData[2];
-            CamRot.w = CamData[3];
-            CamRot.x = CamData[4];
-            CamRot.y = CamData[5];
-            CamRot.z = CamData[6];
-            CamFOV   = CamData[7];
-            //Log("Read POS: " + CamPos.ToString() + ", ROT: " + CamRot.ToString() + " FOV: " + CamFOV.ToString());
-            _helper.UpdateCameraPose(CamPos, CamRot);
-            _helper.UpdateFov(CamFOV);
+            VNyanSettings = mmfAccess.ReadInt32(sizeof(float) * 8);
+            if ((VNyanSettings & 1) == 1) {
+                mmfAccess.ReadArray<float>(0, CamData, 0, 8);
+                CamPos.x = CamData[0];
+                CamPos.y = CamData[1];
+                CamPos.z = CamData[2];
+                CamRot.w = CamData[3];
+                CamRot.x = CamData[4];
+                CamRot.y = CamData[5];
+                CamRot.z = CamData[6];
+                CamFOV   = CamData[7];
+            
+                if ((VNyanSettings & 4) == 4) {
+                    Log("Read POS: " + CamPos.ToString() + ", ROT: " + CamRot.ToString() + " FOV: " + CamFOV.ToString() + " Settings: " + VNyanSettings.ToString());
+                }
+                _helper.UpdateCameraPose(CamPos, CamRot);
+                _helper.UpdateFov(CamFOV);
+            }
         } catch (Exception ex) {
             Log(ex.ToString());
         }
