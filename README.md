@@ -18,7 +18,7 @@ It is important to understand how this plugin works. Normally LIV will split the
   * [Advanced Mask](https://obsproject.com/forum/resources/advanced-masks.1856/) plugin
 * LIV VR
   * Configured and working in Mixed Reality Avatar mode
-  * (Optional) A VRM file with the same rigging as your VSFAvater
+  * (Optional) A VRM file with the same rigging as your VSFAvatar
 
 ## Installation  
 * Enable plugins in VNyan settings, if not already enabled  
