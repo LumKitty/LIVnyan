@@ -2,7 +2,7 @@
 
 ![ezgif-82a5aa22420e84](https://github.com/user-attachments/assets/dcdc99ee-3f80-4e9f-bb56-4fcd5e13ef3b)
 
-Syncs your VNyan camera over to LIV mixed reality, allowing for VNyan to be your model renderer and have a fully featured model.  
+Syncs your VNyan camera over to LIV mixed reality, allowing for VNyan to be your model renderer and have a fully featured model with full redeems support.  
 Please read these instructions carefully before trying to set this up!
 
 ## Overview
@@ -12,6 +12,7 @@ It is important to understand how this plugin works. Normally LIV will split the
 * VNyan
   * SteamVR tracking set up and working
   * Spout2 output configured and working
+  * (Recommended) a .VSFAvatar model
 * OBS
   * [Spout2](https://github.com/Off-World-Live/obs-spout2-plugin) plugin
   * [Source Clone](https://obsproject.com/forum/resources/source-clone.1632/) plugin
