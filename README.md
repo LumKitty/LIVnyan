@@ -29,10 +29,10 @@ It is important to understand how this plugin works. Normally LIV will split the
   ![image](https://github.com/user-attachments/assets/f23fd6c9-fea4-4aca-a71c-60b4bcf9a386)  
 * Set LIV output to double your stream res (e.g. 1920x1080 = 3840x2160)
   ![image](https://github.com/user-attachments/assets/6eba1d67-3951-4e32-8e40-46c33564a0e5)
-* Put your VR headset on, open LIV from the circle on the floor and enable avatart
+* Put your VR headset on, open LIV from the circle on the floor and enable avatars
 * Go to: Camera 1 -> Plugin -> LIVnyan to enable the plugin
 * Do one of the following:
-  * (Better performance) Disable rendering all parts of your avatar within LIV, and disable tracking, or
+  * (Better performance) Disable rendering all parts of your avatar within LIV and disable tracking, or
   * (Better visiblity) Load a VRM version of your avatar, and enable whatever trackers you actually have
 
 ## OBS Setup
@@ -42,7 +42,7 @@ It is important to understand how this plugin works. Normally LIV will split the
   * Add a crop filter, crop left: 1920 bottom: 1080. Do not use a transform for this!
   * Place this *behind* the "LIV Quadrants" source so it is completely hidden  
 * Capture VNyan Spout2 output in the usual way
-  * place this in front of "LIV Quadrands"  
+  * place this in front of "LIV Quadrants"  
 * Source clone "LIV Quadrants" again, name it "LIV Glow".
   * Add a crop filter, crop right 1920 bottom: 1080.
   * Right click it -> Blending Mode -> Add
@@ -92,8 +92,10 @@ These logs will get very big very quickly. Only enable this for troubleshooting!
 Adjust back/forward offset in LIV's camera advanced settings  
 ![image](https://github.com/user-attachments/assets/d5d2ff5d-146f-429b-8996-0d1c3972cbaa)
 ### LIV output window is cropped
-If your monitor resolution is too small, LIV will "helpfully" crop the output window to your actual size. If you are streaming at 1080p and do not have a 4K monitor this will affect you.  
+If your monitor resolution is too small, LIV will crop the output window to your actual size. If you are streaming at 1080p and do not have a 4K monitor this will affect you.  
 Use [Virtual Display Driver](https://github.com/VirtualDrivers/Virtual-Display-Driver) to create a fake 3840x2160 display. As an added bonus this hides the LIV output window from your actual monitor which makes it significantly less annoying!
+### Irritating green dot moving around the edge of your VR view
+Another LIV feature. It's suppossed to tell you where your camera is currently. Apparently the only way to disable it is to set camera 1 to selfie and then you have the option to disable it, then you can set it back to plugin. This setting does not persist between sessions. I
 
 ## Lighting (optional)
 Use [Sjatar's Stylistic Screen Light plugin](https://github.com/Sjatar/StylisticScreenLight)  
