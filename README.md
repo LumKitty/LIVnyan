@@ -10,7 +10,7 @@ It is important to understand how this plugin works. Normally LIV will split the
 
 ## Prerequisites
 * VNyan
-  * SteamVR tracking set up and working
+  * SteamVR tracking configured and working
   * Spout2 output configured and working
   * (Recommended) a .VSFAvatar model
 * OBS
