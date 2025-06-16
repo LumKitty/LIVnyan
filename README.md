@@ -12,7 +12,7 @@ It is important to understand how this plugin works. Normally LIV will split the
 * VNyan
   * SteamVR tracking configured and working
   * Spout2 output configured and working
-  * (Recommended) a .VSFAvatar model
+  * (Recommended) a .VSFAvatar model [^1]
 * OBS
   * [Spout2](https://github.com/Off-World-Live/obs-spout2-plugin) plugin
   * [Source Clone](https://obsproject.com/forum/resources/source-clone.1632/) plugin
@@ -20,6 +20,10 @@ It is important to understand how this plugin works. Normally LIV will split the
 * LIV VR
   * Mixed Reality Avatar mode configured and working
   * (Optional) A VRM file with the same rigging as your VSFAvatar
+* General
+  * A sufficiently powerful PC
+  * Understanding of OBS filters
+  * Understanding of the Windows filesystem, DLL files, JSON files etc.
 
 ## Installation  
 * Enable plugins in VNyan settings, if not already enabled  
@@ -32,7 +36,7 @@ It is important to understand how this plugin works. Normally LIV will split the
   * Target: your game
   * Effect: Dump + Composite  
   ![image](https://github.com/user-attachments/assets/f23fd6c9-fea4-4aca-a71c-60b4bcf9a386)  
-* Set LIV output to double your stream res (e.g. 1920x1080 = 3840x2160)
+* Set LIV output to double your OBS Canvas size (e.g. 1920x1080 = 3840x2160)
   ![image](https://github.com/user-attachments/assets/6eba1d67-3951-4e32-8e40-46c33564a0e5)
 * Put your VR headset on, open LIV from the circle on the floor and enable avatars
 * Go to: Camera 1 -> Plugin -> LIVnyan to enable the plugin
@@ -41,6 +45,7 @@ It is important to understand how this plugin works. Normally LIV will split the
   * (Better visiblity) Load a VRM version of your avatar, and enable whatever trackers you actually have
 
 ## OBS Setup
+Note: The numbers in this section assume your canvas size is 1920x1080. If it is not then subsitue your actual canvas size as appropriate
 * Capture LIV Output using Game Capture, name it "LIV Quadrants"  
   * Using the transform editor on "LIV Quadrants", crop right: 1920 top: 1080 from your LIV Output. Do not use filters for this!  
 * Source clone "LIV Quadrants", name it "LIV Alpha Mask"
@@ -64,6 +69,7 @@ It is important to understand how this plugin works. Normally LIV will split the
   ![image](https://github.com/user-attachments/assets/112250d1-3203-4a98-a06d-a98a56ece377)
 
 ## VNyan Setup
+* Ensure that VNyan's window size is the same size 
 * Configure SteamVR and calibrate your trackers in the usual way
 * Ensure the plugin is active by one of the following methods
   * Click the button in the VNyan plugins screen to toggle enable/disable
@@ -113,6 +119,11 @@ Use [Sjatar's Stylistic Screen Light plugin](https://github.com/Sjatar/Stylistic
 Add a "Sprout Sender" filter to "LIV Front Layer" after crop/pad but before Advanced Mask. Name the source "screen"
 ![image](https://github.com/user-attachments/assets/8909d36c-0549-4202-b862-32b6911a4417)
 
+## Support
+Either open an issue here (preferred), or ask in the LIVnyan thread on [Suvi's Discord](https://discord.com/channels/714814460010823690/1373846127975207002)
+
 ## Shameless plug
 ### https://twitch.tv/LumKitty
 If you find this plugin useful, please consider sending a follow or a raid my way. If you somehow make millions using it, consider sharing some of that with me :3
+
+[^1]: While you can use a VRM model with LIVnyan. Given that LIV natively supports VRM files it is probably not worth setting up LIVnyan, unless you really need VNyan redeems to work!
