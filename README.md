@@ -64,6 +64,11 @@ It is important to understand how this plugin works. Normally LIV will split the
   * Click the button in the VNyan plugins screen to toggle enable/disable
   * Call the ```_lum_liv_enable``` trigger
   * Edit LIVnyan.cfg to set ActiveOnStart = true and restart VNyan
+ 
+## Notes on calibration
+VNyan tracker callibration will need some experimentation to find the method that works best for you. For me I find it best to stand about 30cm behind the feet markers (in Beat Saber) and then run VNyan's calibration. Please share any tips & tricks you find for this.  
+Many VRoid models have their arms too short. The closer your model matches your IRL height and proportions the less likely you are to have weapons fly away from your hand when your arms are outstretched. Elbow IK should also work better
+For games that don't show objects/weapons in your hand, these calibration issues will be less noticible
 
 ## Final Checks before going live 
 * LIV manual target and effect set correctly (LIV does not remember these settings)
