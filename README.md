@@ -15,7 +15,10 @@ It is important to understand how this plugin works. Normally LIV will split the
 * OBS
   * [Spout2](https://github.com/Off-World-Live/obs-spout2-plugin) plugin
   * [Source Clone](https://obsproject.com/forum/resources/source-clone.1632/) plugin
-  * [Advanced Mask](https://obsproject.com/forum/resources/advanced-masks.1856/) plugin 
+  * [Advanced Mask](https://obsproject.com/forum/resources/advanced-masks.1856/) plugin
+* LIV VR
+  * Configured and working in Mixed Reality Avatar mode
+  * (Optional) A VRM file with the same rigging as your VSFAvater
 
 ## Installation  
 * Enable plugins in VNyan settings, if not already enabled  
