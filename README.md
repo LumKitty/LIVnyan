@@ -10,19 +10,30 @@ It is important to understand how this plugin works. Normally LIV will split the
 ## Prerequisites
 * VNyan
   * SteamVR tracking set up and working
+  * Spout2 output configured and working
 * OBS
+  * [Spout2](https://github.com/Off-World-Live/obs-spout2-plugin) plugin
   * [Source Clone](https://obsproject.com/forum/resources/source-clone.1632/) plugin
   * [Advanced Mask](https://obsproject.com/forum/resources/advanced-masks.1856/) plugin 
 
 ## Installation  
 * Enable plugins in VNyan settings, if not already enabled  
 * Copy VNyan-LIV.dll into the VNyan\Items\Assemblies folder  
-* Copy LIV_VNyan.dll into C:\Users\<you>\Documents\LIV\Plugins\CameraBehaviours  
-* Enable plugin from LIV within VR (Camera 1 -> Plugin -> LIVnyan)  
-* Set LIV output to double your stream res (e.g. 1920x1080 = 3840x2160) and Effect: Dump + Composite.  
-![image](https://github.com/user-attachments/assets/f23fd6c9-fea4-4aca-a71c-60b4bcf9a386)
-* Use [Virtual Display Driver](https://github.com/VirtualDrivers/Virtual-Display-Driver) if LIV truncates the window due to your monitor being too small. This creates a virtual monitor of a size of your choosing, which you can send LIV output to  
-![image](https://github.com/user-attachments/assets/6eba1d67-3951-4e32-8e40-46c33564a0e5)
+* Copy LIV_VNyan.dll into C:\Users\<you>\Documents\LIV\Plugins\CameraBehaviours
+
+## LIV Setup
+* Start Virtual Cameras and Avatars
+* Set capture to "Manual"
+  * Target: your game
+  * Effect: Dump + Composite  
+  ![image](https://github.com/user-attachments/assets/f23fd6c9-fea4-4aca-a71c-60b4bcf9a386)  
+* Set LIV output to double your stream res (e.g. 1920x1080 = 3840x2160)
+  ![image](https://github.com/user-attachments/assets/6eba1d67-3951-4e32-8e40-46c33564a0e5)
+* Put your VR headset on, open LIV from the circle on the floor and enable avatart
+* Go to: Camera 1 -> Plugin -> LIVnyan to enable the plugin
+* Do one of the following:
+  * (Better performance) Disable rendering all parts of your avatar within LIV, and disable tracking, or
+  * (Better visiblity) Load a VRM version of your avatar, and enable whatever trackers you actually have
 
 ## OBS Setup
 * Capture LIV Output using Game Capture, name it "LIV Quadrants"  
@@ -44,12 +55,23 @@ It is important to understand how this plugin works. Normally LIV will split the
     * Filter type: "greyscale"
   ![image](https://github.com/user-attachments/assets/d530679a-1a00-4619-bfac-eb09ddfb9e44)
 
-The end result should look something like this:  
-![image](https://github.com/user-attachments/assets/112250d1-3203-4a98-a06d-a98a56ece377)
+  The end result should look something like this:  
+  ![image](https://github.com/user-attachments/assets/112250d1-3203-4a98-a06d-a98a56ece377)
 
-## Lighting (optional)
-Use [Sjatar's Stylistic Screen Light plugin](https://github.com/Sjatar/StylisticScreenLight)  
-Add a "Sprout Sender" filter to "LIV Front Layer" after crop/pad but before Advanced Mask. Name the source "screen"
+## VNyan Setup
+* Configure SteamVR and calibrate your trackers in the usual way
+* Ensure the plugin is active by one of the following methods
+  * Click the button in the VNyan plugins screen to toggle enable/disable
+  * Call the ```_lum_liv_enable``` trigger
+  * Edit LIVnyan.cfg to set ActiveOnStart = true and restart VNyan
+
+## Final Checks before going live 
+* LIV manual target and effect set correctly (LIV does not remember these settings)
+* Check your OBS scene and ensure that your model appears in the correct place
+* Drag the camera around in the VNyan window, and check that LIV's output follows it
+* Are foreground objects and glowing objects correctly passing in front of your model
+* Are your feet being chopped off (See the troubleshooting section for this)
+* Have any physics on your model glitched while you were doing all this? (reload avatar if so)
 
 ## Use in VNyan
 Clicking the plugin button toggles camera sync  
@@ -69,6 +91,13 @@ These logs will get very big very quickly. Only enable this for troubleshooting!
 ### Feet or bottom of screen getting clipped  
 Adjust back/forward offset in LIV's camera advanced settings  
 ![image](https://github.com/user-attachments/assets/d5d2ff5d-146f-429b-8996-0d1c3972cbaa)
+### LIV output window is cropped
+If your monitor resolution is too small, LIV will "helpfully" crop the output window to your actual size. If you are streaming at 1080p and do not have a 4K monitor this will affect you.  
+Use [Virtual Display Driver](https://github.com/VirtualDrivers/Virtual-Display-Driver) to create a fake 3840x2160 display. As an added bonus this hides the LIV output window from your actual monitor which makes it significantly less annoying!
+
+## Lighting (optional)
+Use [Sjatar's Stylistic Screen Light plugin](https://github.com/Sjatar/StylisticScreenLight)  
+Add a "Sprout Sender" filter to "LIV Front Layer" after crop/pad but before Advanced Mask. Name the source "screen"
 
 
 ## https://twitch.tv/LumKitty
