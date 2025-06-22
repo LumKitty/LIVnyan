@@ -1,20 +1,8 @@
-﻿using Microsoft.Win32.SafeHandles;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.IO.MemoryMappedFiles;
-using System.Net;
-using System.Net.Sockets;
-using System.Reflection;
-using System.Runtime;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.XR;
 using VNyanInterface;
-using static UnityEngine.Experimental.Rendering.RayTracingAccelerationStructure;
 
 namespace VNyan_Liv {
     public class VNyan_Liv : MonoBehaviour, IVNyanPluginManifest, IButtonClickedHandler, ITriggerHandler {
@@ -27,49 +15,34 @@ namespace VNyan_Liv {
         private const string SettingsFileName = "LIVnyan.cfg";
 
         private static float[] CamData = new float[9];
-        private static Mutex mutex;
-        private static MemoryMappedFile mmf;
+        private static MemoryMappedFile mmf = null;
         private static MemoryMappedViewAccessor mmfAccess;
         private const int MMFSize = sizeof(float) * 9;
-
-        //private static bool Enabled = false;
-        //private static bool LogEnabled;
         private static int VNyanSettings = 2;
+        private static GameObject objLIVnyan;
 
-        void ErrorHandler(Exception e) {
+        private void ErrorHandler(Exception e) {
             VNyanInterface.VNyanInterface.VNyanParameter.setVNyanParameterString("_lum_liv_err", e.ToString());
             UnityEngine.Debug.Log("[LIVnyanERR] " + e.ToString());
         }
 
-        public void Log(string message) {
-            if ((VNyanSettings & 2) == 2) {
-                //System.IO.File.AppendAllText("D:\\Dev\\VNyan-liv.log", message+"\n");
+        private void Log(string message) {
+            if ((VNyanSettings & SharedValues.LOGENABLED) != 0) {
                 UnityEngine.Debug.Log("[LIVnyan] " + message);
             }
         }
 
         public void InitializePlugin() {
             try {
-                Log("Lum's VNyan-LIV plugin version " + Version + " started");
-                Log("Spawning gameobject");
-                using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(this.GetType(), "VNyan-Liv.vnobj")) {
-                    byte[] bundleData = new byte[stream.Length];
-                    stream.Read(bundleData, 0, bundleData.Length);
-                    AssetBundle bundle = AssetBundle.LoadFromMemory(bundleData);
-                    GameObject.Instantiate(bundle.LoadAsset<GameObject>(bundle.GetAllAssetNames()[0]));
-                }
+                Log("LumKitty's VNyan-LIV plugin version " + Version + " started");
+                Log("Spawning gameobject: VNyan_LIV");
+                objLIVnyan = new GameObject("VNyan_LIV", typeof(VNyan_Liv));
+                objLIVnyan.SetActive(false);
                 VNyanInterface.VNyanInterface.VNyanTrigger.registerTriggerListener(this);
                 VNyanInterface.VNyanInterface.VNyanUI.registerPluginButton("LumKitty's LIV Camera sync", this);
-                Log("Float size: " + sizeof(float).ToString() + " bytes");
-                Log("Bool size: " + sizeof(bool).ToString() + " bytes");
-                Log("Creating file");
-
-                mmf = MemoryMappedFile.CreateOrOpen(SharedValues.MMFname, SharedValues.MMFSize);
-
-                Log("Creating accessor");
-                mmfAccess = mmf.CreateViewAccessor(0, MMFSize);
                 LoadPluginSettings();
-
+                objLIVnyan.SetActive((VNyanSettings & SharedValues.CAMENABLED) != 0);
+                InitialiseMMF();
             } catch (Exception e) {
                 ErrorHandler(e);
             }
@@ -134,38 +107,29 @@ namespace VNyan_Liv {
 
         private void SavePluginSettings() {
             Dictionary<string, string> settings = new Dictionary<string, string>();
-            settings["ActiveOnStart"] = ((VNyanSettings & 1) == 1).ToString();
-            settings["LogEnabled"] = ((VNyanSettings & 2) == 2).ToString();
-            settings["LogSpam"] = false.ToString();
+            settings["ActiveOnStart"] = ((VNyanSettings & SharedValues.CAMENABLED) != 0).ToString();
+            settings["LogEnabled"]    = ((VNyanSettings & SharedValues.LOGENABLED) != 0).ToString();
+            settings["LogSpam"]       = false.ToString();
 
             VNyanInterface.VNyanInterface.VNyanSettings.saveSettings(SettingsFileName, settings);
         }
 
-        unsafe private void SetCam() {
-            try {
-                if ((VNyanSettings & 1) == 1) {
-                    var camera = Camera.main;
-                    mmfAccess.Write(0, camera.transform.position.x);
-                    mmfAccess.Write(sizeof(float) * 1, camera.transform.position.y);
-                    mmfAccess.Write(sizeof(float) * 2, camera.transform.position.z);
-                    mmfAccess.Write(sizeof(float) * 3, camera.transform.rotation.w);
-                    mmfAccess.Write(sizeof(float) * 4, camera.transform.rotation.x);
-                    mmfAccess.Write(sizeof(float) * 5, camera.transform.rotation.y);
-                    mmfAccess.Write(sizeof(float) * 6, camera.transform.rotation.z);
-                    mmfAccess.Write(sizeof(float) * 7, camera.fieldOfView);
-                    if ((VNyanSettings & 4) == 4) {
-                        Log("Set POS: " + camera.transform.position.ToString() + " ROT: " + camera.transform.rotation.ToString() + " FOV: " + camera.fieldOfView + " Settings: " + VNyanSettings);
-                    }
-                }
-                mmfAccess.Write(sizeof(float) * 8, VNyanSettings);
-            } catch (Exception e) {
-                ErrorHandler(e);
-            }
-        }
-
         public void pluginButtonClicked() {
-            VNyanSettings = VNyanSettings ^ 1;
-            Log("Enabled :" + ((VNyanSettings & 1) == 1).ToString());
+            Log("Plugin button clicked");
+            VNyanSettings = VNyanSettings ^ SharedValues.CAMENABLED;
+            InitialiseMMF();
+            objLIVnyan.SetActive((VNyanSettings & SharedValues.CAMENABLED) != 0 );
+            mmfAccess.Write(sizeof(float) * 8, VNyanSettings);
+            Log("Enabled: " + ((VNyanSettings & SharedValues.CAMENABLED) != 0).ToString());
+        }
+        
+        private void InitialiseMMF() {
+            if ((mmf == null) && ((VNyanSettings & SharedValues.CAMENABLED) != 0)) {
+                Log("Creating file");
+                mmf = MemoryMappedFile.CreateOrOpen(SharedValues.MMFname, SharedValues.MMFSize);
+                Log("Creating accessor");
+                mmfAccess = mmf.CreateViewAccessor(0, MMFSize);
+            }
         }
 
         public void triggerCalled(string name, int int1, int int2, int int3, string text1, string text2, string text3) {
@@ -176,10 +140,15 @@ namespace VNyan_Liv {
                         Log("LIV: Detected trigger: " + name);
                         switch (name.Substring(8)) {
                             case "_enable":
-                                VNyanSettings = VNyanSettings | 1;
+                                VNyanSettings = VNyanSettings | SharedValues.CAMENABLED;
+                                objLIVnyan.SetActive(true);
+                                mmfAccess.Write(sizeof(float) * 8, VNyanSettings);
+                                InitialiseMMF();
                                 break;
                             case "_disable":
-                                VNyanSettings = (VNyanSettings | 1) - 1;
+                                VNyanSettings = (VNyanSettings | SharedValues.CAMENABLED) - SharedValues.CAMENABLED;
+                                objLIVnyan.SetActive(false);
+                                mmfAccess.Write(sizeof(float) * 8, VNyanSettings);
                                 break;
                         }
                     }
@@ -190,7 +159,18 @@ namespace VNyan_Liv {
         }
         public void Update() {
             try {
-                SetCam();
+                // var camera = Camera.main;
+                mmfAccess.Write(0, Camera.main.transform.position.x);
+                mmfAccess.Write(sizeof(float) * 1, Camera.main.transform.position.y);
+                mmfAccess.Write(sizeof(float) * 2, Camera.main.transform.position.z);
+                mmfAccess.Write(sizeof(float) * 3, Camera.main.transform.rotation.w);
+                mmfAccess.Write(sizeof(float) * 4, Camera.main.transform.rotation.x);
+                mmfAccess.Write(sizeof(float) * 5, Camera.main.transform.rotation.y);
+                mmfAccess.Write(sizeof(float) * 6, Camera.main.transform.rotation.z);
+                mmfAccess.Write(sizeof(float) * 7, Camera.main.fieldOfView);
+                if ((VNyanSettings & SharedValues.LOGSPAMENABLED) !=0) {
+                    Log("Set POS: " + Camera.main.transform.position.ToString() + " ROT: " + Camera.main.transform.rotation.ToString() + " FOV: " + Camera.main.fieldOfView + " Settings: " + VNyanSettings);
+                }
             } catch (Exception e) {
                 ErrorHandler(e);
             }

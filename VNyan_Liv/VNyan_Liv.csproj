@@ -1,9 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Deterministic>false</Deterministic>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
@@ -24,17 +23,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="VNyan-Liv.vnobj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="UnityEngine">
-      <HintPath>C:\Program Files\Unity\Hub\Editor\2020.3.40f1\Editor\Data\Managed\UnityEngine.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>C:\Program Files\Unity\Hub\Editor\2022.3.61f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="VNyanInterface">
       <HintPath>..\..\..\Twitch\Software\VNyan\VNyan_Data\Managed\VNyanInterface.dll</HintPath>
-      <Private>False</Private>
     </Reference>
   </ItemGroup>
 
