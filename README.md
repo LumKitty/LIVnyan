@@ -1,9 +1,10 @@
-## LIV-VNyan camera sync plugin
+## LIVNyan - A camera sync plugin for VNyan and LIV VR
+Syncs your VNyan camera over to LIV mixed reality  
+Allows VNyan to be your VTuber renderer allowing for high quality models and full redeem support - no more VRMs!  
 
-![ezgif-82a5aa22420e84](https://github.com/user-attachments/assets/dcdc99ee-3f80-4e9f-bb56-4fcd5e13ef3b)
-
-Syncs your VNyan camera over to LIV mixed reality, allowing for VNyan to be your model renderer and have a fully featured model with full redeems support.  
+![A catgirl VTuber plays Beat Saber](https://github.com/LumKitty/LIVnyan/blob/master/LIVnyan_demo.gif?raw=true)  
 Please read these instructions carefully before trying to set this up!
+
 
 ## Overview
 It is important to understand how this plugin works. Normally LIV will split the VR scene into effectively three image layers, background, glow and foreground. It will then build up a composite image: Background, VRM avatar, glow layer and foreground. This setup works by replacing the VRM avatar layer with a capture from VNyan and manually doing the compositing of the layers in OBS, instead of letting LIV do it. In order to make VNyan fit correctly there are a pair of plugins, one for VNyan that sends its camera position, over to the LIV plugin which sets the camera plugin to match VNyan.
