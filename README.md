@@ -29,7 +29,7 @@ It is important to understand how this plugin works. Normally LIV will split the
 ## Installation  
 * Enable plugins in VNyan settings, if not already enabled  
 * Copy VNyan-LIV.dll into the VNyan\Items\Assemblies folder  
-* Copy LIV_VNyan.dll into C:\Users\<you>\Documents\LIV\Plugins\CameraBehaviours
+* Copy LIV_VNyan.dll into C:\Users\\\<you>\Documents\LIV\Plugins\CameraBehaviours
 
 ## LIV Setup
 * Start Virtual Cameras and Avatars
@@ -108,7 +108,7 @@ These logs will get very big very quickly. Only enable this for troubleshooting!
 ## Lum's recommendations
 These are completely optional, but are how I do things
 * Have an "EnableVR" websocket trigger that enables SteamVR and LipSync, disables ARKit & LeapMotion. Also have a "DisableVR" websocket that does the opposite. Put these on a toggle button on your stream deck.
-* If you have physics, especially skirts, and will be taking stream breaks: have a scene change button for your RV scene that waits for ~4 seconds, then reloads your avatar, waits another second and then switches scene. This will minimise any issues with skirt clipping caused by pretzeling, giving you time to get to a neutral position in your VR space before forcing a physics reset
+* If you have physics, especially skirts, and will be taking stream breaks: have a scene change button for your VR scene that waits for ~4 seconds, then reloads your avatar, waits another second and then switches scene. This will minimise any issues with skirt clipping caused by pretzeling, giving you time to get to a neutral position in your VR space before forcing a physics reset
 * If you use VoiceMeeter, have both your regular microphone and your VR headset microphone routed to the same virtual audio cable. Connect OBS, discord etc. to this virtual cable, then have a stream deck button that mutes one and unmutes the other, and vice versa
 * Also in VoiceMeeter, have a virtual audio cable for discord comms and/or redeems, have this routed to both your regular headphones and your VR headset
 * VoiceMeeter again: Have a "Rescan audio" button that runs ```Voicemeeter.exe -r``` Since the Index headset is generally not connected until you launch SteamVR, VoiceMeeter will not pick it up as a valid sound target on launch, but forcing a rescan like this fixes that without having to manually kill and re-open it
