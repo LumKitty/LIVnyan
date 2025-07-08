@@ -39,7 +39,7 @@ namespace VNyan_Liv {
                 objLIVnyan = new GameObject("VNyan_LIV", typeof(VNyan_Liv));
                 objLIVnyan.SetActive(false);
                 VNyanInterface.VNyanInterface.VNyanTrigger.registerTriggerListener(this);
-                VNyanInterface.VNyanInterface.VNyanUI.registerPluginButton("LumKitty's LIV Camera sync", this);
+                VNyanInterface.VNyanInterface.VNyanUI.registerPluginButton("LIVnyan", this);
                 LoadPluginSettings();
                 objLIVnyan.SetActive((VNyanSettings & SharedValues.CAMENABLED) != 0);
                 InitialiseMMF();
