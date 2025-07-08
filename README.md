@@ -13,6 +13,7 @@ It is important to understand how this plugin works. Normally LIV will split the
   * SteamVR tracking configured and working
   * Spout2 output configured and working
   * (Recommended) a .VSFAvatar model [^1]
+  * (Optional) My [Extras Plugin](https://github.com/LumKitty/LumsExtras/) to prevent accidentally resizing VNyan while in VR
 * OBS
   * [Spout2](https://github.com/Off-World-Live/obs-spout2-plugin) plugin
   * [Source Clone](https://obsproject.com/forum/resources/source-clone.1632/) plugin
@@ -43,6 +44,7 @@ It is important to understand how this plugin works. Normally LIV will split the
 * Do one of the following:
   * (Better performance) Disable rendering all parts of your avatar within LIV and disable tracking, or
   * (Better visiblity) Load a VRM version of your avatar, and enable whatever trackers you actually have
+  * (Best option, but paid) Disable rendering & tracking in LIV, pop out the OBS preview to a separate window and then use XSOverlay (or similar) to display that preview within VR
 
 ## OBS Setup
 Note: The numbers in this section assume your canvas size is 1920x1080. If it is not then subsitue your actual canvas size as appropriate
@@ -69,7 +71,7 @@ Note: The numbers in this section assume your canvas size is 1920x1080. If it is
   ![image](https://github.com/user-attachments/assets/112250d1-3203-4a98-a06d-a98a56ece377)
 
 ## VNyan Setup
-* Ensure that VNyan's window size is the same size 
+* Ensure that VNyan's window size is the same size as all your LIV sources  
 * Configure SteamVR and calibrate your trackers in the usual way
 * Ensure the plugin is active by one of the following methods
   * Click the button in the VNyan plugins screen to toggle enable/disable
@@ -80,14 +82,6 @@ Note: The numbers in this section assume your canvas size is 1920x1080. If it is
 VNyan tracker callibration will need some experimentation to find the method that works best for you. For me I find it best to stand about 30cm behind the feet markers (in Beat Saber) and then run VNyan's calibration. Please share any tips & tricks you find for this.  
 Many VRoid models have their arms too short. The closer your model matches your IRL height and proportions the less likely you are to have weapons fly away from your hand when your arms are outstretched. Elbow IK should also work better.  
 For games that don't show objects/weapons in your hand, these calibration issues will be less noticible  
-
-## Final Checks before going live 
-* LIV manual target and effect set correctly (LIV does not remember these settings)
-* Check your OBS scene and ensure that your model appears in the correct place
-* Drag the camera around in the VNyan window, and check that LIV's output follows it
-* Are foreground objects and glowing objects correctly passing in front of your model
-* Are your feet being chopped off (See the troubleshooting section for this)
-* Have any physics on your model glitched while you were doing all this? (reload avatar if so)
 
 ## Use in VNyan
 Clicking the plugin button toggles camera sync  
@@ -102,6 +96,27 @@ Settings are stored in LIVnyan.cfg inside your VNyan profile directory (default 
 %USERPROFILE%\Documents\LIV\Plugins\CameraBehaviours\LIVnyan.log  
 ```LogSpam``` - Both plugins will log sent/recieved camera position, rotation & FOV, plus settings info every single frame.  
 These logs will get very big very quickly. Only enable this for troubleshooting!  
+
+## Final Checks before going live 
+* LIV manual target and effect set correctly (LIV does not remember these settings)
+* Check your OBS scene and ensure that your model appears in the correct place
+* Drag the camera around in the VNyan window, and check that LIV's output follows it
+* Are foreground objects and glowing objects correctly passing in front of your model
+* Are your feet being chopped off (See the troubleshooting section for this)
+* Have any physics on your model glitched while you were doing all this? (reload avatar if so)
+
+## Lum's recommendations
+These are completely optional, but are how I do things
+* Have an "EnableVR" websocket trigger that enables SteamVR and LipSync, disables ARKit & LeapMotion. Also have a "DisableVR" websocket that does the opposite. Put these on a toggle button on your stream deck.
+* If you have physics, especially skirts, and will be taking stream breaks: have a scene change button for your RV scene that waits for ~4 seconds, then reloads your avatar, waits another second and then switches scene. This will minimise any issues with skirt clipping caused by pretzeling, giving you time to get to a neutral position in your VR space before forcing a physics reset
+* If you use VoiceMeeter, have both your regular microphone and your VR headset microphone routed to the same virtual audio cable. Connect OBS, discord etc. to this virtual cable, then have a stream deck button that mutes one and unmutes the other, and vice versa
+* Also in VoiceMeeter, have a virtual audio cable for discord comms and/or redeems, have this routed to both your regular headphones and your VR headset
+* VoiceMeeter again: Have a "Rescan audio" button that runs ```Voicemeeter.exe -r``` Since the Index headset is generally not connected until you launch SteamVR, VoiceMeeter will not pick it up as a valid sound target on launch, but forcing a rescan like this fixes that without having to manually kill and re-open it
+* If your are playing a rhythm game and are routing your audio through VoiceMeeter, carefully check your audio calibration. For me the lag created by voicemeeter is 120ms, which is quite significant
+* Configure VNyan to switch to 1920x1080 on launch, then use my [Extras Plugin](https://github.com/LumKitty/LumsExtras/) to lock VNyan's window size. Preventing accidental resizing errors when you're trying to do an emergency recalibrate
+* Use XSOverlay or similar to show your OBS preview window within VR, and check it frequently, especially if you have physics on your model
+* Take full advantage of VNyan's features. Go wild with redeems, Poiyomi shaders, Magica cloth. You put all the effort in to set this up, so make use of it!
+* Follow LumKitty on https://twitch.tv/LumKitty :3
 
 ## Troubleshooting
 ### Feet or bottom of screen getting clipped  
