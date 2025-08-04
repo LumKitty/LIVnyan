@@ -127,7 +127,7 @@ Adjust back/forward offset in LIV's camera advanced settings
 If your monitor resolution is too small, LIV will crop the output window to your actual size. If you are streaming at 1080p and do not have a 4K monitor this will affect you.  
 Use [Virtual Display Driver](https://github.com/VirtualDrivers/Virtual-Display-Driver) to create a fake 3840x2160 display. As an added bonus this hides the LIV output window from your actual monitor which makes it significantly less annoying!
 ### Irritating green dot moving around the edge of your VR view
-Another LIV feature. It's suppossed to tell you where your camera is currently. Apparently the only way to disable it is to set camera 1 to selfie and then you have the option to disable it, then you can set it back to plugin. This setting does not persist between sessions. Please report this bug to the LIV developers!
+Another LIV feature. It's suppossed to tell you where your camera is currently. Apparently the only way to disable it is to set camera 1 to selfie and then you have the option to disable it, then you can set it back to plugin. This setting does not persist between sessions. Unfortunately this is not something I can fix.  
 
 ## Lighting (optional)
 Use [Sjatar's Stylistic Screen Light plugin](https://github.com/Sjatar/StylisticScreenLight)  
