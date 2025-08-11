@@ -28,6 +28,7 @@ It is important to understand how this plugin works. Normally LIV will split the
   * Understanding of the Windows filesystem, DLL files, JSON files etc.
 
 ## Installation  
+* Download the latest version from the [Releases Page](https://github.com/LumKitty/LIVnyan/releases)
 * Enable plugins in VNyan settings, if not already enabled  
 * Copy VNyan-LIV.dll into the VNyan\Items\Assemblies folder  
 * Copy LIV_VNyan.dll into C:\Users\\\<you>\Documents\LIV\Plugins\CameraBehaviours
