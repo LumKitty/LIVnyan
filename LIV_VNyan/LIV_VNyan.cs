@@ -20,6 +20,7 @@ using UnityEngine;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using static SharedValues;
+using Newtonsoft.Json;
 
 // User defined settings which will be serialized and deserialized with Newtonsoft Json.Net.
 // Only public variables will be serialized.
@@ -66,6 +67,7 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     private Quaternion CamRot;
     private float CamFOV;
     private int VNyanSettings=2;
+    // private int FramesElapsed = 0;
 
     [Obsolete]
     public void OnActivate(PluginCameraHelper helper) {
@@ -82,6 +84,10 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
             mmf = MemoryMappedFile.CreateOrOpen(SharedValues.MMFname, SharedValues.MMFSize);
             Log("Creating accessor");
             mmfAccess = mmf.CreateViewAccessor(0, SharedValues.MMFSize, MemoryMappedFileAccess.Read);
+            //foreach (Camera camera in Camera.allCameras) {
+            //    camera.usePhysicalProperties = true;
+            //}
+
         } catch (Exception ex) {
             Log(ex.ToString());
         }
@@ -104,6 +110,27 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
             
                 if ((VNyanSettings & LOGSPAMENABLED) !=0) {
                     Log("Read POS: " + CamPos.ToString() + ", ROT: " + CamRot.ToString() + " FOV: " + CamFOV.ToString() + " Settings: " + VNyanSettings.ToString());
+                    /* if (FramesElapsed >= 60) { FramesElapsed = 0; }
+                    if (FramesElapsed == 0) {
+                        int n = 0;
+                        foreach (Camera camera in Camera.allCameras) {
+                            Log("----------------Camera " + n.ToString() + "---------------------------------");
+                            Log("FOV                    : " + camera.fieldOfView.ToString());
+                            Log("Physical Camera Enabled: " + camera.usePhysicalProperties.ToString());
+                            Log("Focal Length           : " + camera.focalLength.ToString());
+                            Log("Orthograhpic           : " + camera.orthographic.ToString());
+                            Log("Sensor Size            : " + camera.sensorSize.ToString());
+                            Log("Lens Shift             : " + camera.lensShift.ToString());
+                            Log("Gate Fit               : " + camera.gateFit.ToString());
+                            Log("Height                 : " + camera.pixelHeight.ToString());
+                            Log("Width                  : " + camera.pixelWidth.ToString());
+                            Log("Far clip plane         : " + camera.farClipPlane.ToString());
+                            Log("Near clip plane        : " + camera.nearClipPlane.ToString());
+                            n++;
+                        }
+                        Log("");
+                    }
+                    FramesElapsed++; */
                 }
                 _helper.UpdateCameraPose(CamPos, CamRot);
                 _helper.UpdateFov(CamFOV);

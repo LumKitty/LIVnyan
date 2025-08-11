@@ -20,6 +20,8 @@ namespace VNyan_Liv {
         private const int MMFSize = sizeof(float) * 9;
         private static int VNyanSettings = 2;
         private static GameObject objLIVnyan;
+        //private static int FramesElapsed = 0;
+
 
         private void ErrorHandler(Exception e) {
             VNyanInterface.VNyanInterface.VNyanParameter.setVNyanParameterString("_lum_liv_err", e.ToString());
@@ -121,6 +123,7 @@ namespace VNyan_Liv {
             objLIVnyan.SetActive((VNyanSettings & SharedValues.CAMENABLED) != 0 );
             mmfAccess.Write(sizeof(float) * 8, VNyanSettings);
             Log("Enabled: " + ((VNyanSettings & SharedValues.CAMENABLED) != 0).ToString());
+            Camera.main.usePhysicalProperties = ((VNyanSettings & SharedValues.CAMENABLED) == 0);
         }
         
         private void InitialiseMMF() {
@@ -170,6 +173,20 @@ namespace VNyan_Liv {
                 mmfAccess.Write(sizeof(float) * 7, Camera.main.fieldOfView);
                 if ((VNyanSettings & SharedValues.LOGSPAMENABLED) !=0) {
                     Log("Set POS: " + Camera.main.transform.position.ToString() + " ROT: " + Camera.main.transform.rotation.ToString() + " FOV: " + Camera.main.fieldOfView + " Settings: " + VNyanSettings);
+                    /*if (FramesElapsed >= 60) { FramesElapsed = 0; }
+                    if (FramesElapsed == 0) {
+                        Log("FOV                    : " + Camera.main.fieldOfView.ToString());
+                        Log("Physical Camera Enabled: " + Camera.main.usePhysicalProperties.ToString());
+                        Log("Focal Length           : " + Camera.main.focalLength.ToString());
+                        Log("Orthograhpic           : " + Camera.main.orthographic.ToString());
+                        Log("Sensor Size            : " + Camera.main.sensorSize.ToString());
+                        Log("Lens Shift             : " + Camera.main.lensShift.ToString());
+                        Log("Gate Fit               : " + Camera.main.gateFit.ToString());
+                        Log("Height                 : " + Camera.main.pixelHeight.ToString());
+                        Log("Width                  : " + Camera.main.pixelWidth.ToString());
+                        Log("----------------------------------------------------");
+                    }
+                    FramesElapsed++;*/
                 }
             } catch (Exception e) {
                 ErrorHandler(e);
