@@ -36,13 +36,13 @@ It is important to understand how this plugin works. Normally LIV will split the
 ## LIV Setup
 * Start Virtual Cameras and Avatars
 * Set capture to "Auto"
-  * Target resolution: Your OBS canvas size, or smaller if you stream with borders
+  * Target resolution: Your OBS canvas size, or maybe smaller if you stream with large borders
   ![image](https://github.com/user-attachments/assets/9c94ebea-2e0b-48eb-86c9-188a8369821e)
 * Set capture to "Manual"
   * Target: your game
   * Effect: Dump + Composite  
   ![image](https://github.com/user-attachments/assets/f23fd6c9-fea4-4aca-a71c-60b4bcf9a386)  
-* Set LIV output to double your OBS Canvas size (e.g. 1920x1080 = 3840x2160)
+* Set LIV output to double your target resolution (e.g. 1920x1080 = 3840x2160)
   ![image](https://github.com/user-attachments/assets/6eba1d67-3951-4e32-8e40-46c33564a0e5)
 * Put your VR headset on, open LIV from the circle on the floor and enable avatars
 * Go to: Camera 1 -> Plugin -> LIVnyan to enable the plugin
@@ -52,7 +52,7 @@ It is important to understand how this plugin works. Normally LIV will split the
   * (Best option, but paid) Disable rendering & tracking in LIV, pop out the OBS preview to a separate window and then use XSOverlay (or similar) to display that preview within VR
 
 ## OBS Setup
-Note: The numbers in this section assume your canvas size is 1920x1080. If it is not then subsitue your actual canvas size as appropriate
+Note: The numbers in this section assume your target resolution is 1920x1080. If it is not then subsitue your actual target resolution as appropriate
 * Capture LIV Output using Game Capture, name it "LIV Quadrants"  
   * Using the transform editor on "LIV Quadrants", crop right: 1920 top: 1080 from your LIV Output. Do not use filters for this!  
 * Source clone "LIV Quadrants", name it "LIV Alpha Mask"
@@ -129,10 +129,12 @@ Adjust back/forward offset in LIV's camera advanced settings
 ![image](https://github.com/user-attachments/assets/d5d2ff5d-146f-429b-8996-0d1c3972cbaa)
 ### LIV output window is cropped
 If your monitor resolution is too small, LIV will crop the output window to your actual size. If you are streaming at 1080p and do not have a 4K monitor this will affect you.  
-Use [Virtual Display Driver](https://github.com/VirtualDrivers/Virtual-Display-Driver) to create a fake 3840x2160 display. As an added bonus this hides the LIV output window from your actual monitor which makes it significantly less annoying!
+Use [Virtual Display Driver](https://github.com/VirtualDrivers/Virtual-Display-Driver) to create a fake 3840x2160 display. As an added bonus this hides the LIV output window from your actual monitor which makes it significantly less annoying (although having a fake monitor is annoying in different ways, so remember to disable it outside of VR streaming)
+WARNING: If you are using Virtual Display Driver. Ensure that you enable the display before you start SteamVR. Otherwise you will hit a bug SteamVR when trying to interact with your desktop that causes the mouse pointer to be massively offset from where you point your controller. Only fix at this point is to restart SteamVR. Guaranteed this will bite you in the arse mid-stream, so be careful!  
 ### Irritating green dot moving around the edge of your VR view
 Another LIV feature. It's suppossed to tell you where your camera is currently. Apparently the only way to disable it is to set camera 1 to selfie and then you have the option to disable it, then you can set it back to plugin. This setting does not persist between sessions. Unfortunately this is not something I can fix.  
-### in-game objects move before
+### in-game objects move before your VTuber
+Increase the Camera latency in LIV until it lines up
 
 ## Lighting (optional)
 Use [Sjatar's Stylistic Screen Light plugin](https://github.com/Sjatar/StylisticScreenLight)  
