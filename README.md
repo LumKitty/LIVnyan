@@ -82,11 +82,12 @@ Note: The numbers in this section assume your target resolution is 1920x1080. If
   * Click the button in the VNyan plugins screen to toggle enable/disable
   * Call the ```_lum_liv_enable``` trigger
   * Edit LIVnyan.cfg to set ActiveOnStart = true and restart VNyan
+* If activated successfully, your model should appear slightly more zoomed out than normal. This is expected behaviour. When deactivated it will revert to default.
  
 ## Notes on calibration
-VNyan tracker callibration will need some experimentation to find the method that works best for you. For me I find it best to stand about 30cm behind the feet markers (in Beat Saber) and then run VNyan's calibration. Please share any tips & tricks you find for this.  
 Many VRoid models have their arms too short. The closer your model matches your IRL height and proportions the less likely you are to have weapons fly away from your hand when your arms are outstretched. Elbow IK should also work better.  
-For games that don't show objects/weapons in your hand, these calibration issues will be less noticible  
+For games that don't show objects/weapons in your hand, these calibration issues will be less noticible.
+The zoom out effect is because VNyan uses a "physical camera" setting that emulated the distortion curved lens of an IRL camera to give a more natural look. LIV does not do this and cannot easily be changed. Instead we simply disable the physical camera options in VNyan while LIVnyan sync is active
 
 ## Use in VNyan
 Clicking the plugin button toggles camera sync  
@@ -95,7 +96,7 @@ Clicking the plugin button toggles camera sync
 ```_lum_liv_disable``` - disable camera sync  
 
 ## Configuration
-Settings are stored in LIVnyan.cfg inside your VNyan profile directory (default %APPDATA%\..\LocalLow\Suvidriel\VNyan)  
+Settings are stored in LIVnyan.cfg inside your VNyan profile directory (default %APPDATA%\..\LocalLow\Suvidriel\VNyan). This file will appear the first time you start VNyan with LIVnyan installed. Any changes will only take effect after restarting VNyan  
 ```ActiveOnStart``` - Camera sync will start as soon as VNyan loads  
 ```LogEnabled``` - The VNyan plugin will log to player.log in the main VNyan profile directory. The LIV plugin will log to
 %USERPROFILE%\Documents\LIV\Plugins\CameraBehaviours\LIVnyan.log  
@@ -133,8 +134,8 @@ Use [Virtual Display Driver](https://github.com/VirtualDrivers/Virtual-Display-D
 WARNING: If you are using Virtual Display Driver. Ensure that you enable the display before you start SteamVR. Otherwise you will hit a bug SteamVR when trying to interact with your desktop that causes the mouse pointer to be massively offset from where you point your controller. Only fix at this point is to restart SteamVR. Guaranteed this will bite you in the arse mid-stream, so be careful!  
 ### Irritating green dot moving around the edge of your VR view
 Another LIV feature. It's suppossed to tell you where your camera is currently. Apparently the only way to disable it is to set camera 1 to selfie and then you have the option to disable it, then you can set it back to plugin. This setting does not persist between sessions. Unfortunately this is not something I can fix.  
-### in-game objects move before your VTuber
-Increase the Camera latency in LIV until it lines up
+### In-game objects move before your VTuber
+Increase the Camera latency in LIV's camera calibration settings until it lines up
 
 ## Lighting (optional)
 Use [Sjatar's Stylistic Screen Light plugin](https://github.com/Sjatar/StylisticScreenLight)  
