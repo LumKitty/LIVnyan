@@ -56,7 +56,8 @@ Note: The numbers in this section assume your target resolution is 1920x1080. If
 * Capture LIV Output using Game Capture, name it "LIV Quadrants"  
   * Using the transform editor on "LIV Quadrants", crop right: 1920 top: 1080 from your LIV Output. Do not use filters for this!  
 * Source clone "LIV Quadrants", name it "LIV Alpha Mask"
-  * Add a crop filter, crop left: 1920 bottom: 1080. Do not use a transform for this!
+  * Add a crop filter, crop left: 1920 bottom: 1080. Do not use a transform for this!  
+  * **Update**: If this filter is giving you a solid white square, try changing the LIV effect from "Dump+Composite" to just "Dump", set bottom crop to 0 and top crop to 1080
   * Place this *behind* the "LIV Quadrants" source so it is completely hidden  
 * Capture VNyan Spout2 output in the usual way
   * place this in front of "LIV Quadrants"  
