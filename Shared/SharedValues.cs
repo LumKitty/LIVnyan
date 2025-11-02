@@ -5,7 +5,7 @@ public class SharedValues {
     public const string PluginName = "LIVnyan";
     public const string Author = "LumKitty";
     public const string Website = "https://lum.uk/";
-    public const string Version = "v1.1";
+    public const string Version = "v1.2";
     public const string ProtocolVersion = "v1.0";
     public const string MMFname = "uk.lum.livnyan.cameradata." + ProtocolVersion;
     public const int MMFSize = (sizeof(float) * 8)+sizeof(int);

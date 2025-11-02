@@ -5,6 +5,7 @@ using UnityEngine;
 using VNyanInterface;
 
 namespace VNyan_Liv {
+    [DefaultExecutionOrder(15000)]
     public class VNyan_Liv : MonoBehaviour, IVNyanPluginManifest, IButtonClickedHandler, ITriggerHandler {
         public string PluginName { get; } = SharedValues.PluginName;
         public string Version { get; } = SharedValues.Version;
@@ -160,7 +161,7 @@ namespace VNyan_Liv {
                 ErrorHandler(e);
             }
         }
-        public void Update() {
+        public void LateUpdate() {
             try {
                 // var camera = Camera.main;
                 mmfAccess.Write(0, Camera.main.transform.position.x);

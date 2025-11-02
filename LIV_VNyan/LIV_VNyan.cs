@@ -94,7 +94,10 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
     }
 
     [Obsolete]
-    public void OnUpdate() {
+    public void OnUpdate() {}
+
+    // OnLateUpdate is called after OnUpdate also everyframe and has a higher chance that transform updates are more recent.
+    public void OnLateUpdate() {
         try {
             VNyanSettings = mmfAccess.ReadInt32(sizeof(float) * 8);
             if ((VNyanSettings & CAMENABLED) != 0) {
@@ -106,9 +109,9 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
                 CamRot.x = CamData[4];
                 CamRot.y = CamData[5];
                 CamRot.z = CamData[6];
-                CamFOV   = CamData[7];
-            
-                if ((VNyanSettings & LOGSPAMENABLED) !=0) {
+                CamFOV = CamData[7];
+
+                if ((VNyanSettings & LOGSPAMENABLED) != 0) {
                     Log("Read POS: " + CamPos.ToString() + ", ROT: " + CamRot.ToString() + " FOV: " + CamFOV.ToString() + " Settings: " + VNyanSettings.ToString());
                     /* if (FramesElapsed >= 60) { FramesElapsed = 0; }
                     if (FramesElapsed == 0) {
@@ -139,9 +142,6 @@ public class VNyanCameraPlugin : IPluginCameraBehaviour {
             Log(ex.ToString());
         }
     }
-
-    // OnLateUpdate is called after OnUpdate also everyframe and has a higher chance that transform updates are more recent.
-    public void OnLateUpdate() {}
 
     // OnDeactivate is called when the user changes the profile to other camera behaviour or when the application is about to close.
     // The camera behaviour should clean everything it created when the behaviour is deactivated.
