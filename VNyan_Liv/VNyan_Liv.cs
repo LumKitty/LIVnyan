@@ -1,11 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.MemoryMappedFiles;
+using System.Threading;
 using UnityEngine;
 using VNyanInterface;
 
 namespace VNyan_Liv {
     [DefaultExecutionOrder(15000)]
+    public class CameraTransform {
+        public Vector3 Position;
+        public Quaternion Rotation;
+        public DateTime TargetTime;
+
+        public CameraTransform(Vector3 _Position, Quaternion _Rotation, DateTime _TargetTime) {
+            Position = _Position;
+            Rotation = _Rotation;
+            TargetTime = _TargetTime;
+        }
+        public bool Ready {
+            get { return (DateTime.UtcNow >= TargetTime); }
+        }
+        public void SetCam() {
+            Camera.main.transform.position = Position;
+            Camera.main.transform.rotation = Rotation;
+        }
+    }
+    
     public class VNyan_Liv : MonoBehaviour, IVNyanPluginManifest, IButtonClickedHandler, ITriggerHandler {
         public string PluginName { get; } = SharedValues.PluginName;
         public string Version { get; } = SharedValues.Version;
@@ -13,7 +33,7 @@ namespace VNyan_Liv {
         public string Author { get; } = SharedValues.Author;
         public string Website { get; } = SharedValues.Website;
 
-        private const string SettingsFileName = "LIVnyan.cfg";
+        private readonly string SettingsFileName = VNyanInterface.VNyanInterface.VNyanSettings.getProfilePath()+"\\LIVnyan.cfg";
 
         private static float[] CamData = new float[9];
         private static MemoryMappedFile mmf = null;
@@ -22,6 +42,8 @@ namespace VNyan_Liv {
         private static int VNyanSettings = 2;
         private static GameObject objLIVnyan;
         //private static int FramesElapsed = 0;
+        private static uint CursedCameraDelay = 0;
+        private static List<CameraTransform> CursedCamera = new List<CameraTransform>();
 
 
         private void ErrorHandler(Exception e) {
@@ -52,8 +74,9 @@ namespace VNyan_Liv {
         }
 
         private void LoadPluginSettings() {
-            try { 
+            try {
                 // Get settings in dictionary
+                Log("Reading settings from: " + SettingsFileName);
                 Dictionary<string, string> settings = VNyanInterface.VNyanInterface.VNyanSettings.loadSettings(SettingsFileName);
                 bool SettingMissing = false;
                 int tempVNyanSettings = 0;
@@ -94,6 +117,17 @@ namespace VNyan_Liv {
                         Log("ActiveOnStart setting missing, defaulting to disabled");
                         SettingMissing = true;
                     }
+                    if (settings.TryGetValue("CursedCamera", out tempSetting)) {
+                        if (uint.TryParse(tempSetting, out CursedCameraDelay)) {
+                            Log("Cursed Camera delay set to: "+CursedCameraDelay.ToString());
+                        } else {
+                            Log("Cursed Camera disabled");
+                            SettingMissing = true;
+                        }
+                    } else {
+                        Log("Cursed Camera setting missing, defaulting to disabled");
+                        SettingMissing = true;
+                    }
                 } else {
                     Log("No settings file detected, using defaults");
                     SettingMissing = true;
@@ -113,22 +147,19 @@ namespace VNyan_Liv {
             settings["ActiveOnStart"] = ((VNyanSettings & SharedValues.CAMENABLED) != 0).ToString();
             settings["LogEnabled"]    = ((VNyanSettings & SharedValues.LOGENABLED) != 0).ToString();
             settings["LogSpam"]       = false.ToString();
+            settings["CursedCamera"]  = CursedCameraDelay.ToString();
 
             VNyanInterface.VNyanInterface.VNyanSettings.saveSettings(SettingsFileName, settings);
         }
 
         public void pluginButtonClicked() {
             Log("Plugin button clicked");
-            VNyanSettings = VNyanSettings ^ SharedValues.CAMENABLED;
-            InitialiseMMF();
-            objLIVnyan.SetActive((VNyanSettings & SharedValues.CAMENABLED) != 0 );
-            mmfAccess.Write(sizeof(float) * 8, VNyanSettings);
+            SetActive(!objLIVnyan.activeInHierarchy);
             Log("Enabled: " + ((VNyanSettings & SharedValues.CAMENABLED) != 0).ToString());
-            Camera.main.usePhysicalProperties = ((VNyanSettings & SharedValues.CAMENABLED) == 0);
         }
         
         private void InitialiseMMF() {
-            if ((mmf == null) && ((VNyanSettings & SharedValues.CAMENABLED) != 0)) {
+            if (mmf == null) {
                 Log("Creating file");
                 mmf = MemoryMappedFile.CreateOrOpen(SharedValues.MMFname, SharedValues.MMFSize);
                 Log("Creating accessor");
@@ -136,6 +167,27 @@ namespace VNyan_Liv {
             }
         }
 
+        private void SetActive(bool Active) {
+            if (Active) {
+                Log("Initialise MMF");
+                InitialiseMMF();
+                Log("Update Settings");
+                VNyanSettings = VNyanSettings | SharedValues.CAMENABLED;
+                Log("Write settings to MMF");
+                mmfAccess.Write(sizeof(float) * 8, VNyanSettings);
+                Log("Enable LIVnyan GameObject");
+                objLIVnyan.SetActive(true);
+                Log("Disable physical camera");
+                Camera.main.usePhysicalProperties = false;
+            } else {
+                VNyanSettings = (VNyanSettings | SharedValues.CAMENABLED) - SharedValues.CAMENABLED;
+                objLIVnyan.SetActive(false);
+                CursedCamera.Clear();
+                mmfAccess.Write(sizeof(float) * 8, VNyanSettings);
+                Camera.main.usePhysicalProperties = true;
+            }
+        }
+        
         public void triggerCalled(string name, int int1, int int2, int int3, string text1, string text2, string text3) {
             try {
                 if (name.Length > 10) {
@@ -144,15 +196,17 @@ namespace VNyan_Liv {
                         Log("LIV: Detected trigger: " + name);
                         switch (name.Substring(8)) {
                             case "_enable":
-                                VNyanSettings = VNyanSettings | SharedValues.CAMENABLED;
-                                objLIVnyan.SetActive(true);
-                                mmfAccess.Write(sizeof(float) * 8, VNyanSettings);
-                                InitialiseMMF();
+                                if (int1 > 0) {
+                                    CursedCameraDelay = (uint)int1;
+                                    Log("CursedCamera set to: " + CursedCameraDelay.ToString());
+                                } else if (int1 <0) {
+                                    CursedCameraDelay = 0;
+                                    Log("CursedCamera disabled");
+                                }
+                                SetActive(true);
                                 break;
                             case "_disable":
-                                VNyanSettings = (VNyanSettings | SharedValues.CAMENABLED) - SharedValues.CAMENABLED;
-                                objLIVnyan.SetActive(false);
-                                mmfAccess.Write(sizeof(float) * 8, VNyanSettings);
+                                SetActive(false);
                                 break;
                         }
                     }
@@ -188,6 +242,25 @@ namespace VNyan_Liv {
                         Log("----------------------------------------------------");
                     }
                     FramesElapsed++;*/
+                }
+                if (CursedCameraDelay > 0) {
+                    CursedCamera.Add(new CameraTransform(Camera.main.transform.position, Camera.main.transform.rotation, DateTime.UtcNow.AddMilliseconds(CursedCameraDelay)));
+                    //Log("New Frame");
+                    int Count = CursedCamera.Count;
+                    //Log("0/" + Count.ToString());
+                    
+                    if (!CursedCamera[0].Ready) {
+                        CursedCamera[0].SetCam();
+                    } else {
+                        int n = 1;
+                        while (n < CursedCamera.Count && CursedCamera[n].Ready) {
+                            //Log(n.ToString()+"/" + CursedCamera.Count.ToString());
+                            n++;
+                        }
+                        CursedCamera[n - 1].SetCam();
+                        CursedCamera.RemoveRange(0, n);
+                    }
+                    //Log ("Queue Len: "+CursedCamera.Count.ToString()+" Time: "+DateTime.UtcNow.ToString()+" Next trg time: " + CursedCamera[0].TargetTime);
                 }
             } catch (Exception e) {
                 ErrorHandler(e);
