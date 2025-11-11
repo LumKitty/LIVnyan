@@ -103,6 +103,7 @@ Settings are stored in LIVnyan.cfg inside your VNyan profile directory (default 
 %USERPROFILE%\Documents\LIV\Plugins\CameraBehaviours\LIVnyan.log  
 ```LogSpam``` - Both plugins will log sent/recieved camera position, rotation & FOV, plus settings info every single frame.  
 These logs will get very big very quickly. Only enable this for troubleshooting!  
+```CursedCamera``` - Adds a delay to all camera movements in VNyan, while still updating LIV in realtime. Fixes the issue during fast pans where your model moves ahead of the VR world. See the Advanced Timing section before changing this option
 
 ## Final Checks before going live 
 * LIV manual target and effect set correctly (LIV does not remember these settings)
