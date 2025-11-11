@@ -87,8 +87,8 @@ Note: The numbers in this section assume your target resolution is 1920x1080. If
  
 ## Notes on calibration
 Many VRoid models have their arms too short. The closer your model matches your IRL height and proportions the less likely you are to have weapons fly away from your hand when your arms are outstretched. Elbow IK should also work better.  
-For games that don't show objects/weapons in your hand, these calibration issues will be less noticible.
-The zoom out effect is because VNyan uses a "physical camera" setting that emulated the distortion curved lens of an IRL camera to give a more natural look. LIV does not do this and cannot easily be changed. Instead we simply disable the physical camera options in VNyan while LIVnyan sync is active
+For games that don't show objects/weapons in your hand, these calibration issues will be less noticible.  
+The zoom out effect is because VNyan uses a "physical camera" setting that emulates the distortion curved lens of an IRL camera to give a more natural look. LIV does not do this and cannot easily be changed. Instead we simply disable the physical camera options in VNyan while LIVnyan sync is active
 
 ## Use in VNyan
 Clicking the plugin button toggles camera sync  
@@ -111,6 +111,22 @@ These logs will get very big very quickly. Only enable this for troubleshooting!
 * Are foreground objects and glowing objects correctly passing in front of your model
 * Are your feet being chopped off (See the troubleshooting section for this)
 * Have any physics on your model glitched while you were doing all this? (reload avatar if so)
+
+## Alignment timing
+Because this setup is merging two separate video feeds from two different sources, there is going to be some manual sync needed to get the best results.  
+I recommend using a game where you are always holding an object, such as Beat Saber, and recording these tests
+### Aligning hands to weapons
+First move your hands around and observe that your saber moves ahead of your hands.  
+Using a video player that allows you to step through frame by frame (I use AVIDemux), make a note of how many frames it takes for your hand to reach the saber. Multiply this by 16.667 and set LIV's camera latency to the resulting value.  
+Test and record again, adjust camera latency as necessary, repeat until you are 100% happy with the result. Do not go on to the next step until then.
+### Aligning camera pans
+If you will only be using a static camera this step is not strictly necessary.  
+Create a temporary set of nodes that switch between camera positions with a transition time of around 1000ms, start recording and fire these nodes
+If your model moves ahead of the VR world then you will need to use the "Cursed Camera" feature. This feature intercepts VNyan camera movement, sends it to LIV and then forces a camera movement delay in VNyan. An unavoidable side effect of enabling this feature is that manual camera movements will feel laggy
+As before, count how many frames it takes for LIV's camera to catch up to VNyan's. The result will likely be the same (or very close) to the LIV camera delay you set in the previous step.
+call ```_lum_liv_enable``` passing this result into value1 and move the camera again. Hopefully it now lines up, but if necessary re-record and adjust until it's perfect
+Once you have the final value, close VNyan, edit LIVnyan.cfg and set Cursed camera there to make the change permanent 
+Remember that if you change the LIV camera latency, you will also need to adjust the Cursed Camera latency
 
 ## Lum's recommendations
 These are completely optional, but are how I do things
@@ -137,6 +153,8 @@ WARNING: If you are using Virtual Display Driver. Ensure that you enable the dis
 Another LIV feature. It's suppossed to tell you where your camera is currently. Apparently the only way to disable it is to set camera 1 to selfie and then you have the option to disable it, then you can set it back to plugin. This setting does not persist between sessions. Unfortunately this is not something I can fix.  
 ### In-game objects move before your VTuber
 Increase the Camera latency in LIV's camera calibration settings until it lines up
+### During camera pans, your avatar moves before the game world
+Enable the "Cursed Camera" delay feature in LIVnyan.cfg or by passing a value to int1 when calling ```_lum_liv_enable``` that approximately matches the camera latency setting in LIV  
 
 ## Lighting (optional)
 Use [Sjatar's Stylistic Screen Light plugin](https://github.com/Sjatar/StylisticScreenLight)  
