@@ -38,7 +38,6 @@ namespace VNyan_Liv {
         private static float[] CamData = new float[9];
         private static MemoryMappedFile mmf = null;
         private static MemoryMappedViewAccessor mmfAccess;
-        private const int MMFSize = sizeof(float) * 9;
         private static int VNyanSettings = 2;
         private static GameObject objLIVnyan;
         //private static int FramesElapsed = 0;
@@ -68,6 +67,9 @@ namespace VNyan_Liv {
                 LoadPluginSettings();
                 objLIVnyan.SetActive((VNyanSettings & SharedValues.CAMENABLED) != 0);
                 InitialiseMMF();
+                Log("Window size set to to: " + Screen.width.ToString() + "," + Screen.height.ToString());
+                mmfAccess.Write(SharedValues.MMFPos_ResX, Screen.width);
+                mmfAccess.Write(SharedValues.MMFPos_ResY, Screen.height);
             } catch (Exception e) {
                 ErrorHandler(e);
             }
@@ -163,7 +165,7 @@ namespace VNyan_Liv {
                 Log("Creating file");
                 mmf = MemoryMappedFile.CreateOrOpen(SharedValues.MMFname, SharedValues.MMFSize);
                 Log("Creating accessor");
-                mmfAccess = mmf.CreateViewAccessor(0, MMFSize);
+                mmfAccess = mmf.CreateViewAccessor(0, SharedValues.MMFSize);
             }
         }
 
@@ -174,7 +176,7 @@ namespace VNyan_Liv {
                 Log("Update Settings");
                 VNyanSettings = VNyanSettings | SharedValues.CAMENABLED;
                 Log("Write settings to MMF");
-                mmfAccess.Write(sizeof(float) * 8, VNyanSettings);
+                mmfAccess.Write(SharedValues.MMFPos_Settings, VNyanSettings);
                 Log("Enable LIVnyan GameObject");
                 objLIVnyan.SetActive(true);
                 Log("Disable physical camera");
@@ -183,7 +185,7 @@ namespace VNyan_Liv {
                 VNyanSettings = (VNyanSettings | SharedValues.CAMENABLED) - SharedValues.CAMENABLED;
                 objLIVnyan.SetActive(false);
                 CursedCamera.Clear();
-                mmfAccess.Write(sizeof(float) * 8, VNyanSettings);
+                mmfAccess.Write(SharedValues.MMFPos_Settings, VNyanSettings);
                 Camera.main.usePhysicalProperties = true;
             }
         }
@@ -215,17 +217,26 @@ namespace VNyan_Liv {
                 ErrorHandler(e);
             }
         }
+
+        public void OnRectTransformDimensionsChange() {
+            Log("Window size changed to: " + Screen.width.ToString() + "," + Screen.height.ToString());
+            mmfAccess.Write(SharedValues.MMFPos_ResX, Screen.width);
+            mmfAccess.Write(SharedValues.MMFPos_ResY, Screen.height);
+        }
+
         public void LateUpdate() {
             try {
                 // var camera = Camera.main;
-                mmfAccess.Write(0, Camera.main.transform.position.x);
-                mmfAccess.Write(sizeof(float) * 1, Camera.main.transform.position.y);
-                mmfAccess.Write(sizeof(float) * 2, Camera.main.transform.position.z);
-                mmfAccess.Write(sizeof(float) * 3, Camera.main.transform.rotation.w);
-                mmfAccess.Write(sizeof(float) * 4, Camera.main.transform.rotation.x);
-                mmfAccess.Write(sizeof(float) * 5, Camera.main.transform.rotation.y);
-                mmfAccess.Write(sizeof(float) * 6, Camera.main.transform.rotation.z);
-                mmfAccess.Write(sizeof(float) * 7, Camera.main.fieldOfView);
+                mmfAccess.Write(SharedValues.MMFPos_CamPosX, Camera.main.transform.position.x);
+                mmfAccess.Write(SharedValues.MMFPos_CamPosY, Camera.main.transform.position.y);
+                mmfAccess.Write(SharedValues.MMFPos_CamPosZ, Camera.main.transform.position.z);
+                mmfAccess.Write(SharedValues.MMFPos_CamRotW, Camera.main.transform.rotation.w);
+                mmfAccess.Write(SharedValues.MMFPos_CamRotX, Camera.main.transform.rotation.x);
+                mmfAccess.Write(SharedValues.MMFPos_CamRotY, Camera.main.transform.rotation.y);
+                mmfAccess.Write(SharedValues.MMFPos_CamRotZ, Camera.main.transform.rotation.z);
+                mmfAccess.Write(SharedValues.MMFPos_CamFOV,  Camera.main.fieldOfView);
+                mmfAccess.Write(SharedValues.MMFPos_ResX, Screen.width);
+                mmfAccess.Write(SharedValues.MMFPos_ResY, Screen.height);
                 if ((VNyanSettings & SharedValues.LOGSPAMENABLED) !=0) {
                     Log("Set POS: " + Camera.main.transform.position.ToString() + " ROT: " + Camera.main.transform.rotation.ToString() + " FOV: " + Camera.main.fieldOfView + " Settings: " + VNyanSettings);
                     /*if (FramesElapsed >= 60) { FramesElapsed = 0; }
