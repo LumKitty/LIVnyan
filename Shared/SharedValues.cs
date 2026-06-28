@@ -13,6 +13,7 @@ public class SharedValues {
     public const int CAMENABLED = 0x1;
     public const int LOGENABLED = 0x2;
     public const int LOGSPAMENABLED = 0x4;
+    public const int OATREADCLIPPLANEPOS = 0x8;
 
     public const long MMFPos_CamPosX   =  0;
     public const long MMFPos_CamPosY   =  1 * sizeof(float);

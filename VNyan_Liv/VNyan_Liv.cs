@@ -41,10 +41,9 @@ namespace VNyan_Liv {
         private static MemoryMappedViewAccessor mmfAccess;
         private static int VNyanSettings = 2;
         private static GameObject objLIVnyan;
-        //private static int FramesElapsed = 0;
         private static uint CursedCameraDelay = 0;
-        private static HumanBodyBones? BoneClip = HumanBodyBones.Hips;
-        private static float BoneClipDistanceAdjust = 0;
+        private static HumanBodyBones? BoneClip = HumanBodyBones.Hips;   //_lum_liv_BoneClip
+        private static float BoneClipDistanceAdjust = 0;                 //_lum_liv_BoneClipDistanceAdjust
         private static bool BoneClipDistanceAdjust2DOnly = true;
         private static List<CameraTransform> CursedCamera = new List<CameraTransform>();
 
@@ -92,7 +91,7 @@ namespace VNyan_Liv {
 
                     if (settings.TryGetValue("ActiveOnStart", out tempSetting)) {
                         if (bool.Parse(tempSetting)) {
-                            tempVNyanSettings += 1;
+                            tempVNyanSettings += SharedValues.CAMENABLED;
                             Log("Camera sync enabled on startup");
                         } else {
                             Log("Camera sync disabled on startup");
@@ -103,7 +102,7 @@ namespace VNyan_Liv {
                     }
                     if (settings.TryGetValue("LogEnabled", out tempSetting)) {
                         if (bool.Parse(tempSetting)) {
-                            tempVNyanSettings += 2;
+                            tempVNyanSettings += SharedValues.LOGENABLED;
                             Log("Logging enabled");
                         } else {
                             Log("Logging disabled");
@@ -114,7 +113,7 @@ namespace VNyan_Liv {
                     }
                     if (settings.TryGetValue("LogSpam", out tempSetting)) {
                         if (bool.Parse(tempSetting)) {
-                            tempVNyanSettings += 4;
+                            tempVNyanSettings += SharedValues.LOGSPAMENABLED;
                             Log("Log spam enabled");
                         } else {
                             Log("Log spam disabled");
@@ -139,6 +138,7 @@ namespace VNyan_Liv {
 
                         if (Enum.TryParse<HumanBodyBones>(tempSetting, out TempBoneClip)) {
                             BoneClip = TempBoneClip;
+                            tempVNyanSettings += SharedValues.OATREADCLIPPLANEPOS;
                             Log("Clipping bone tracker set to: " + TempBoneClip.ToString());
                         } else {
                             Log("Clipping bone tracker setting invalid, defaulting to hips");
@@ -195,7 +195,6 @@ namespace VNyan_Liv {
             settings["BoneClip"]      = BoneClip.ToString();
             settings["BoneClipDistanceAdjust"] = BoneClipDistanceAdjust.ToString();
             settings["BoneClipDistanceAdjust2DOnly"] = BoneClipDistanceAdjust2DOnly.ToString();
-
             VNyanInterface.VNyanInterface.VNyanSettings.saveSettings(SettingsFileName, settings);
         }
 
@@ -254,6 +253,27 @@ namespace VNyan_Liv {
                                 break;
                             case "_disable":
                                 SetActive(false);
+                                break;
+                            case "_setbone":
+                                if (text1.Length > 0) {
+                                    HumanBodyBones TempBoneClip;
+                                    if (Enum.TryParse<HumanBodyBones>(text1, out TempBoneClip)) {
+                                        if ((VNyanSettings & SharedValues.OATREADCLIPPLANEPOS) == 0) { VNyanSettings += SharedValues.OATREADCLIPPLANEPOS; }
+                                        BoneClip = TempBoneClip;
+                                        Log("Clipping bone tracker set to: " + BoneClip.ToString());
+                                    } else {
+                                        //TODO: Talk with MilkyDelta about VNyan controlling the ReadClipPlaneLocation
+                                        if ((VNyanSettings & SharedValues.OATREADCLIPPLANEPOS) != 0) { VNyanSettings -= SharedValues.OATREADCLIPPLANEPOS; }
+                                        BoneClip = null;
+                                    }
+                                }
+                                if (text2.Length > 0) {
+                                    float TempBoneClipDist;
+                                    if (float.TryParse(text2, out TempBoneClipDist)) {
+                                        BoneClipDistanceAdjust = TempBoneClipDist;
+                                        Log("Bone Clip Distance Adjustment set to: " + BoneClipDistanceAdjust.ToString());
+                                    }
+                                }
                                 break;
                         }
                     }
