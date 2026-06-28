@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.MemoryMappedFiles;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.UIElements;
 using VNyanInterface;
 
 namespace VNyan_Liv {
@@ -42,6 +43,9 @@ namespace VNyan_Liv {
         private static GameObject objLIVnyan;
         //private static int FramesElapsed = 0;
         private static uint CursedCameraDelay = 0;
+        private static HumanBodyBones? BoneClip = HumanBodyBones.Hips;
+        private static float BoneClipDistanceAdjust = 0;
+        private static bool BoneClipDistanceAdjust2DOnly = true;
         private static List<CameraTransform> CursedCamera = new List<CameraTransform>();
 
 
@@ -102,11 +106,11 @@ namespace VNyan_Liv {
                             tempVNyanSettings += 2;
                             Log("Logging enabled");
                         } else {
-                            Log("Logging disabled"); 
+                            Log("Logging disabled");
                         }
                     } else {
                         Log("LogEnabled setting missing, defaulting to disabled");
-                        SettingMissing = true; 
+                        SettingMissing = true;
                     }
                     if (settings.TryGetValue("LogSpam", out tempSetting)) {
                         if (bool.Parse(tempSetting)) {
@@ -121,7 +125,7 @@ namespace VNyan_Liv {
                     }
                     if (settings.TryGetValue("CursedCamera", out tempSetting)) {
                         if (uint.TryParse(tempSetting, out CursedCameraDelay)) {
-                            Log("Cursed Camera delay set to: "+CursedCameraDelay.ToString());
+                            Log("Cursed Camera delay set to: " + CursedCameraDelay.ToString());
                         } else {
                             Log("Cursed Camera disabled");
                             SettingMissing = true;
@@ -130,6 +134,44 @@ namespace VNyan_Liv {
                         Log("Cursed Camera setting missing, defaulting to disabled");
                         SettingMissing = true;
                     }
+                    if (settings.TryGetValue("BoneClip", out tempSetting)) {
+                        HumanBodyBones TempBoneClip;
+
+                        if (Enum.TryParse<HumanBodyBones>(tempSetting, out TempBoneClip)) {
+                            BoneClip = TempBoneClip;
+                            Log("Clipping bone tracker set to: " + TempBoneClip.ToString());
+                        } else {
+                            Log("Clipping bone tracker setting invalid, defaulting to hips");
+                            SettingMissing = true;
+                        }
+                    } else {
+                        Log("Clipping bone tracker setting missing, defaulting to hips");
+                        SettingMissing = true;
+                    }
+                    if (settings.TryGetValue("BoneClipDistanceAdjust", out tempSetting)) {
+                        if (float.TryParse(tempSetting, out BoneClipDistanceAdjust)) {
+                            Log("Bone Clip Distance Adjustment set to: " + BoneClipDistanceAdjust.ToString());
+                        } else {
+                            Log("Bone Clip Distance Adjustment setting invalid, defaulting to 0 ");
+                            SettingMissing = true;
+                        }
+                    } else {
+                        Log("Bone Clip Distance Adjustment setting missing, defaulting to 0 ");
+                        SettingMissing = true;
+                    }
+                    if (settings.TryGetValue("BoneClipDistanceAdjust2DOnly", out tempSetting)) {
+                        if (bool.Parse(tempSetting)) {
+                            BoneClipDistanceAdjust2DOnly = true;
+                            Log("Bone Clip Distance Adjustment: 2D");
+                        } else {
+                            Log("Bone Clip Distance Adjustment: 3D");
+                        }
+                    } else {
+                        Log("Bone Clip Distance Adjustment (2D Only) setting missing, defaulting to 2D");
+                        SettingMissing = true;
+                    }
+
+
                 } else {
                     Log("No settings file detected, using defaults");
                     SettingMissing = true;
@@ -150,6 +192,9 @@ namespace VNyan_Liv {
             settings["LogEnabled"]    = ((VNyanSettings & SharedValues.LOGENABLED) != 0).ToString();
             settings["LogSpam"]       = false.ToString();
             settings["CursedCamera"]  = CursedCameraDelay.ToString();
+            settings["BoneClip"]      = BoneClip.ToString();
+            settings["BoneClipDistanceAdjust"] = BoneClipDistanceAdjust.ToString();
+            settings["BoneClipDistanceAdjust2DOnly"] = BoneClipDistanceAdjust2DOnly.ToString();
 
             VNyanInterface.VNyanInterface.VNyanSettings.saveSettings(SettingsFileName, settings);
         }
@@ -235,10 +280,41 @@ namespace VNyan_Liv {
                 mmfAccess.Write(SharedValues.MMFPos_CamRotY, Camera.main.transform.rotation.y);
                 mmfAccess.Write(SharedValues.MMFPos_CamRotZ, Camera.main.transform.rotation.z);
                 mmfAccess.Write(SharedValues.MMFPos_CamFOV,  Camera.main.fieldOfView);
+                
+                // Only used by OnAirTap. Ignored by LIV
                 mmfAccess.Write(SharedValues.MMFPos_ResX, Screen.width);
                 mmfAccess.Write(SharedValues.MMFPos_ResY, Screen.height);
+
+                if (BoneClip != null) {
+                    GameObject AvatarObject = (GameObject)VNyanInterface.VNyanInterface.VNyanAvatar.getAvatarObject();
+                    Animator AvatarAnimator = AvatarObject.GetComponent<Animator>();
+                    Transform BoneTransform = AvatarAnimator.GetBoneTransform((HumanBodyBones)BoneClip);
+
+                    if (BoneClipDistanceAdjust != 0) {
+                        Vector3 AdjustmentVector3D = BoneTransform.position - Camera.main.transform.position;
+                        if (BoneClipDistanceAdjust2DOnly) {
+                            AdjustmentVector3D.y = 0;
+                        }
+                        Vector3 ClipPos = BoneTransform.position + (AdjustmentVector3D.normalized * BoneClipDistanceAdjust);
+                        mmfAccess.Write(SharedValues.MMFPos_ClipPosX, ClipPos.x);
+                        mmfAccess.Write(SharedValues.MMFPos_ClipPosY, ClipPos.y);
+                        mmfAccess.Write(SharedValues.MMFPos_ClipPosZ, ClipPos.z);
+                        if ((VNyanSettings & SharedValues.LOGSPAMENABLED) != 0) {
+                            Log("Set Bone POS: " + ClipPos.ToString());
+                        }
+                    } else {
+                        mmfAccess.Write(SharedValues.MMFPos_ClipPosX, BoneTransform.position.x);
+                        mmfAccess.Write(SharedValues.MMFPos_ClipPosY, BoneTransform.position.y);
+                        mmfAccess.Write(SharedValues.MMFPos_ClipPosZ, BoneTransform.position.z);
+                        if ((VNyanSettings & SharedValues.LOGSPAMENABLED) != 0) {
+                            Log("Set Bone POS: " + BoneTransform.position.ToString());
+                        }
+                    }
+                }
+
                 if ((VNyanSettings & SharedValues.LOGSPAMENABLED) !=0) {
-                    Log("Set POS: " + Camera.main.transform.position.ToString() + " ROT: " + Camera.main.transform.rotation.ToString() + " FOV: " + Camera.main.fieldOfView + " Settings: " + VNyanSettings);
+                    //Log("Set POS: " + Camera.main.transform.position.ToString() + " ROT: " + Camera.main.transform.rotation.ToString() + " FOV: " + Camera.main.fieldOfView + " Settings: " + VNyanSettings);
+                    
                     /*if (FramesElapsed >= 60) { FramesElapsed = 0; }
                     if (FramesElapsed == 0) {
                         Log("FOV                    : " + Camera.main.fieldOfView.ToString());

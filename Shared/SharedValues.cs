@@ -8,7 +8,7 @@ public class SharedValues {
     public const string Version = "v1.3a1";
     public const string ProtocolVersion = "v1.1";
     public const string MMFname = "uk.lum.livnyan.cameradata." + ProtocolVersion;
-    public const int MMFSize = (sizeof(float) * 9)+2*sizeof(Int32);
+    public const int MMFSize = (sizeof(float) * 12)+2*sizeof(int);
 
     public const int CAMENABLED = 0x1;
     public const int LOGENABLED = 0x2;
@@ -23,7 +23,10 @@ public class SharedValues {
     public const long MMFPos_CamRotZ   =  6 * sizeof(float);
     public const long MMFPos_CamFOV    =  7 * sizeof(float);
     public const long MMFPos_Settings  =  8 * sizeof(float);
+    // Only used by OnAirTap. Ignored by LIV camera plugin
     public const long MMFPos_ResX      =  8 * sizeof(float) + 1 * sizeof(int);
     public const long MMFPos_ResY      =  8 * sizeof(float) + 2 * sizeof(int);
-    public const long MMFPos_ClipPropD =  9 * sizeof(float) + 2 * sizeof(int);
+    public const long MMFPos_ClipPosX  =  9 * sizeof(float) + 2 * sizeof(int);
+    public const long MMFPos_ClipPosY  = 10 * sizeof(float) + 2 * sizeof(int);
+    public const long MMFPos_ClipPosZ  = 11 * sizeof(float) + 2 * sizeof(int);
 }
