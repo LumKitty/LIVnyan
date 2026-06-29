@@ -23,7 +23,8 @@
 * Copy LIV_VNyan.dll into C:\Users\\\<you>\Documents\LIV\Plugins\CameraBehaviours
 
 ## OnAirTap setup - BepInEx
-* Install the latest version [BepInEx](https://github.com/bepinex/bepinex) following its instructions
+* Download the latest version of [OnAirTap](https://github.com/LumKitty/LIVnyan/releases/tag/OnAirTap-binary)
+* Install the latest version of [BepInEx](https://github.com/bepinex/bepinex) following its instructions
 * Install the mod by unpacking the OpenBrush build. If you are attempting to use this with a different game you will need to use a different directory for OAT_KlakSpout.dll instead of OpenBrush_Data. Typically it will be GameName_Data
 * Start the game once and quit
 * Edit <GAMEDIR>\BepInEx\config\OnAirTap.cfg
