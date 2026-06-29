@@ -11,6 +11,7 @@
   * [Advanced Mask](https://obsproject.com/forum/resources/advanced-masks.1856/) plugin
 * OnAirTap
   * Understanding of how to mod your chosen game (BepInEx or BSIPA)
+  * Your game uses the LIV 1.5 SDK (If LIV_Bridge.dll is present it should work. If it has LIV_Native.dll or no LIV dlls then your game will not work)
 * General
   * A sufficiently powerful PC
   * Understanding of OBS filters
@@ -85,7 +86,7 @@
   ```
 * OBS setup is the same except instead of OnAirTap-FG2 create OnAirTap-OP. Choose the SpoutSender "OnAirTap Optimised", with composite mode set to default
 
-Note: It is not necessary to remove or deactivate OnAirTap if not streaming/compositing. OnAirTap will not activate its additional rendering unless VNyan is running and LIVnyan is activated.
+Note: It is not necessary to remove or deactivate OnAirTap if not streaming/compositing. OnAirTap will not activate its additional rendering unless VNyan is running and LIVnyan is activated. The only exception is if you want to use LIV instead
 
 For more efficient setups, and Linux support, see the main OnAirTap readme
 
