@@ -17,7 +17,7 @@ It is important to understand how this plugin works. Normally LIV will split the
   * (Optional) My [Extras Plugin](https://github.com/LumKitty/LumsExtras/) to prevent accidentally resizing VNyan while in VR
 * OBS
   * [Spout2](https://github.com/Off-World-Live/obs-spout2-plugin) plugin
-  * [Source Clone](https://obsproject.com/forum/resources/source-clone.1632/) plugin
+  * [Source Clone](https://obsproject.com/forum/resources/source-clone.1632/) plugin (LIV-only, not required for OnAirTap)
   * [Advanced Mask](https://obsproject.com/forum/resources/advanced-masks.1856/) plugin
 * LIV VR
   * Mixed Reality Avatar mode configured and working
