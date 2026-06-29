@@ -14,7 +14,7 @@
 * General
   * A sufficiently powerful PC
   * Understanding of OBS filters
-  * Understanding of the Windows (or Linux) filesystem, DLL files, JSON files etc.
+  * Understanding of the Windows filesystem, DLL files, JSON files etc.
 
 ## Installation  
 * Download the latest version from the [Releases Page](https://github.com/LumKitty/LIVnyan/releases) - needs to be at least 1.3a2
