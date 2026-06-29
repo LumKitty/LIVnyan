@@ -57,14 +57,14 @@
 * Create a Spout2 capture named "OnAirTap-FG". Choose the SpoutSender "OnAirTap Foreground", with Composite Mode set to Opague
 * Right click OnAirTap-FG -> Blending Mode -> Add
 * Right click OnAirTap-FG -> Filters
-* Hit the + button and add an effect filter "Advanced Mask". Set the following settings:
-  Mask Effect: Alpha Mask
-  Mask Type: Source
-  Source: VNyan
-  Scaling: Manual
-  Scale By: Percent (preserve aspect ratio)
-  Scale: 100%
-  Filter On: Alpha Channel
+* Hit the + button and add an effect filter "Advanced Mask". Set the following settings:  
+  Mask Effect: Alpha Mask  
+  Mask Type: Source  
+  Source: VNyan  
+  Scaling: Manual  
+  Scale By: Percent (preserve aspect ratio)  
+  Scale: 100%  
+  Filter On: Alpha Channel  
   (all other settings should be default)
 * Create a Spout2 capture named "OnAirTap-FG2". Choose the SpoutSender "OnAirTap Foreground", with Composite Mode set to Default
 * (Optional) group these up.
