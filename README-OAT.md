@@ -69,8 +69,20 @@
 * (Optional) group these up.
 
 ## OnAirTap setup - Beat Saber
-* Setup is the same as for BepInEx except that the config file is now <GAMEDIR>\UserData\OnAirTap.json and it is not split into individual sections
-* RenderOptimised and SendOptimised should be set to true
+* Setup is the same as for BepInEx except that the config file is now <GAMEDIR>\UserData\OnAirTap.json and it is not split into individual sections. The following settings should be changed:
+  ```
+  "ShouldRenderBG": true,
+  "ShouldRenderFG": true,
+  "ShouldRenderOptimised": true,
+  "ShouldReadResolutionFromMMF": false,
+  "ShouldReadTrackerFromMMF": false,
+  "ShouldSendBG": true,
+  "ShouldSendFG": true,
+  "ShouldSendOptimised": true,
+  "BlankSpoutOnRenderDispose": false,
+  "MMFProtocolMinorVersion": 1,
+  (leave everything else as default)
+  ```
 * OBS setup is the same except instead of OnAirTap-FG2 create OnAirTap-OP. Choose the SpoutSender "OnAirTap Optimised", with composite mode set to default
 
 For more efficient setups, and Linux support, see the main OnAirTap readme
