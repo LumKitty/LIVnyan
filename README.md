@@ -9,6 +9,8 @@ Please read these instructions carefully before trying to set this up!
 ## Overview
 It is important to understand how this plugin works. Normally LIV will split the VR scene into effectively three image layers, background, glow and foreground. It will then build up a composite image: Background, VRM avatar, glow layer and foreground. This setup works by replacing the VRM avatar layer with a capture from VNyan and manually doing the compositing of the layers in OBS, instead of letting LIV do it. In order to make VNyan fit correctly there are a pair of plugins, one for VNyan that sends its camera position, over to the LIV plugin which sets the camera plugin to match VNyan.
 
+As an alternative, if you are willing to run experiemental software, [OnAirTap](https://github.com/LumKitty/LIVnyan/releases/tag/OnAirTap-binary) by MilkyDelta is a replacement for LIV with native Spout2 support for its layers, Linux support, custom resolutions and useful advanced features
+
 ## Prerequisites
 * VNyan
   * SteamVR tracking configured and working
