@@ -20,7 +20,6 @@
 * Download the latest version from the [Releases Page](https://github.com/LumKitty/LIVnyan/releases) - needs to be at least 1.3a2
 * Enable plugins in VNyan settings, if not already enabled  
 * Copy VNyan-LIV.dll into the VNyan\Items\Assemblies folder  
-* Copy LIV_VNyan.dll into C:\Users\\\<you>\Documents\LIV\Plugins\CameraBehaviours
 
 ## OnAirTap setup - BepInEx
 * Download the latest version of [OnAirTap](https://github.com/LumKitty/LIVnyan/releases/tag/OnAirTap-binary)
@@ -41,10 +40,10 @@
   [RenderPasses]
   RenderBackground = true
   RenderForeground = true
-  RenderOptimised = true
+  RenderOptimised = false
   SendBackground = true
   SendForeground = true
-  SendOptimised = true
+  SendOptimised = false
   BlankSendersOnRenderDispose = true
   (leave everything else as default)
   ```
@@ -54,7 +53,7 @@
 ## OBS Setup
 * Create a Spout2 capture named "OnAirTap-BG". Choose the SpoutSender "OnAirTap Background", with Composite Mode set to Opaque
 * Immediately above this, create a Spout2 capture for VNyan with Composite Mode set to default
-* Create a Spout2 capture named "OnAirTap-FG". Choose the SpoutSender "OnAirTap Foreground", with Composite Mode set to Opague
+* Create a Spout2 capture named "OnAirTap-FG". Choose the SpoutSender "OnAirTap Foreground", with Composite Mode set to Opaque
 * Right click OnAirTap-FG -> Blending Mode -> Add
 * Right click OnAirTap-FG -> Filters
 * Hit the + button and add an effect filter "Advanced Mask". Set the following settings:  
@@ -71,6 +70,7 @@
 
 ## OnAirTap setup - Beat Saber
 * Setup is the same as for BepInEx except that the config file is now <GAMEDIR>\UserData\OnAirTap.json and it is not split into individual sections
+* RenderOptimised and SendOptimised should be set to true
 * OBS setup is the same except instead of OnAirTap-FG2 create OnAirTap-OP. Choose the SpoutSender "OnAirTap Optimised", with composite mode set to default
 
 For more efficient setups, and Linux support, see the main OnAirTap readme
