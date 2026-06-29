@@ -1,4 +1,4 @@
-# Instructions for using LIVnyan with OnAirTap instead of LIV
+# QuickStart Instructions for using LIVnyan with OnAirTap instead of LIV
 
 ## Prerequisites
 * VNyan
