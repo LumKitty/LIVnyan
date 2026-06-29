@@ -85,6 +85,8 @@
   ```
 * OBS setup is the same except instead of OnAirTap-FG2 create OnAirTap-OP. Choose the SpoutSender "OnAirTap Optimised", with composite mode set to default
 
+Note: It is not necessary to remove or deactivate OnAirTap if not streaming/compositing. OnAirTap will not activate or render unless VNyan is running and LIVnyan is activated.
+
 For more efficient setups, and Linux support, see the main OnAirTap readme
 
 Continue following the main instructions at [LIVnyan - VNyan Setup](https://github.com/LumKitty/LIVnyan#vnyan-setup)
