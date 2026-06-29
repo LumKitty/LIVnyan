@@ -33,6 +33,8 @@ It is important to understand how this plugin works. Normally LIV will split the
 * Copy VNyan-LIV.dll into the VNyan\Items\Assemblies folder  
 * Copy LIV_VNyan.dll into C:\Users\\\<you>\Documents\LIV\Plugins\CameraBehaviours
 
+**If you will be using OnAirTap instead of LIV, see [OAT-README.md](https://github.com/LumKitty/LIVnyan/blob/master/README-OAT.md) and then skip directly to "VNyan Setup" below**
+
 ## LIV Setup
 * Start Virtual Cameras and Avatars
 * Set capture to "Auto"
@@ -77,7 +79,7 @@ Note: The numbers in this section assume your target resolution is 1920x1080. If
   ![image](https://github.com/user-attachments/assets/112250d1-3203-4a98-a06d-a98a56ece377)
 
 ## VNyan Setup
-* Ensure that VNyan's window size is the same size as all your LIV sources  
+* Ensure that VNyan's window size is the same size as all your LIV sources (not required if using OnAirTap with ReadWindowResolution enabled)  
 * Configure SteamVR and calibrate your trackers in the usual way
 * Ensure the plugin is active by one of the following methods
   * Click the button in the VNyan plugins screen to toggle enable/disable
@@ -118,7 +120,7 @@ Because this setup is merging two separate video feeds from two different source
 I recommend using a game where you are always holding an object, such as Beat Saber, and recording these tests
 ### Aligning hands to weapons
 First move your hands around and observe that your saber moves ahead of your hands.  
-Using a video player that allows you to step through frame by frame (I use AVIDemux), make a note of how many frames it takes for your hand to reach the saber. Multiply this by 16.667 and set LIV's camera latency to the resulting value.  
+Using a video player that allows you to step through frame by frame (I use AVIDemux), make a note of how many frames it takes for your hand to reach the saber. Multiply this by 16.667 and set LIV's camera latency to the resulting value (for OnAirTap, use a Render Delay filter on all your OAT sources, except for VNyan).  
 Test and record again, adjust camera latency as necessary, repeat until you are 100% happy with the result. Do not go on to the next step until then.
 ### Aligning camera pans
 If you will only be using a static camera this step is not strictly necessary.  
